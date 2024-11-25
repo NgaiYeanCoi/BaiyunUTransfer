@@ -5,6 +5,7 @@ package xyz.nyc1;
 
 public class Main {
     public static void main(String[] args) {
+         //System.setProperty("file.encoding", "UTF-8");
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 GUI.creatGUI();
