@@ -1,7 +1,15 @@
 package xyz.nyc1;
+/**
+ * @author NgaiYeanCoi,canyie,Aasling
+ * */
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                GUI.creatGUI();
+            }
+        });
     }
+
 }
