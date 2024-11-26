@@ -12,7 +12,8 @@ public class Main {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                GUI.creatGUI();
+                GUI.creatMainGUI();
+                FileTransferAssistantUI test = new FileTransferAssistantUI();
             }
         });
     }
