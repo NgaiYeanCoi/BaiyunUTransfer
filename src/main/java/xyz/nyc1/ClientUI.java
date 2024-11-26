@@ -3,8 +3,16 @@ package xyz.nyc1;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.List;
 
 /**
  * @author NgaiYeanCoi,canyie,Aasling
@@ -88,6 +96,8 @@ public class ClientUI {
         topPanel.add(connectButton);
         topPanel.add(disconnectButton);
 
+
+
         // 创建日志文本区域
         logTextArea = new JTextArea();
         logTextArea.setEditable(false);
@@ -98,6 +108,11 @@ public class ClientUI {
         bottomPanel.setLayout(new FlowLayout());
         bottomPanel.add(selectFileButton);
         bottomPanel.add(sendFileButton);
+
+        // 初始为不可见
+        sendFileButton.setVisible(false);
+        selectFileButton.setVisible(false);
+        disconnectButton.setVisible(false);
 
         // 添加面板到主面板
         panel.add(topPanel, BorderLayout.NORTH);
@@ -113,9 +128,11 @@ public class ClientUI {
             public void actionPerformed(ActionEvent e) {
                 String ip = ipSegment1.getText() + "." + ipSegment2.getText() + "." + ipSegment3.getText() + "." + ipSegment4.getText();
                 String port = portTextField.getText();
-
-
-                if (port.isEmpty()){
+                // 判断ip以及port的合法性
+                if((ipSegment1.getText().isEmpty()) || ipSegment2.getText().isEmpty()||ipSegment3.getText().isEmpty()||ipSegment4.getText().isEmpty()) {
+                    new ErrorDialog(mainFrame, "IP地址不能为空！");
+                }
+                else if(port.isEmpty()){
                     new ErrorDialog(mainFrame,"\u7aef\u53e3\u4e0d\u80fd\u4e3a\u7a7a");
                 }
                 else if( Integer.parseInt(port) < 1024)
@@ -126,8 +143,12 @@ public class ClientUI {
                     // TODO:添加连接服务器的代码，需要连接后端API
 
                     logTextArea.append("正在连接到 " + ip + ":" + port + "中...\n");
-                }
+                    logTextArea.append("已成功连接！\n");
+                    selectFileButton.setVisible(true);
+                    disconnectButton.setVisible(true);
 
+
+                }
 
             }
         });
@@ -135,27 +156,82 @@ public class ClientUI {
         disconnectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO:断开连接
-                logTextArea.append("断开连接\n");
+                String ip = ipSegment1.getText() + "." + ipSegment2.getText() + "." + ipSegment3.getText();
+                String port = portTextField.getText();
+                // TODO:断开连接，需要后端api
+                logTextArea.append(ip + ":"+ port +" 已断开连接\n");
+                disconnectButton.setVisible(false);
+                selectFileButton.setVisible(false);
+                sendFileButton.setVisible(false);
             }
         });
 
         selectFileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+               JFrame selectFileFrame = new JFrame("选择文件");
+               selectFileFrame.setSize(400, 300);
+               selectFileFrame.setLocationRelativeTo(null);
+               selectFileFrame.setResizable(false);
+               selectFileFrame.setDefaultCloseOperation(selectFileFrame.EXIT_ON_CLOSE);
+               selectFileFrame.setLayout(new BorderLayout());
+               selectFileFrame.setVisible(true);
+                // 创建文件拖放面板
+                JPanel fileDropPanel = new JPanel();
+                fileDropPanel.setBorder(BorderFactory.createTitledBorder("拖放文件到此处"));
+                fileDropPanel.setPreferredSize(new Dimension(400, 200));
+                fileDropPanel.setLayout(new BorderLayout());
+                // 设置拖放目标
+                new DropTarget(fileDropPanel, DnDConstants.ACTION_COPY_OR_MOVE, new DropTargetAdapter() {
+                    public void drop(DropTargetDropEvent evt) {
+                        try {
+                            evt.acceptDrop(DnDConstants.ACTION_COPY);
+                            Transferable transferable = evt.getTransferable();
+                            if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                                List<File> files = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                                for (File file : files) {
+                                    logTextArea.append(file + "\n");
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                // 布局界面
+                JPanel panel = new JPanel();
+                panel.setLayout(new BorderLayout());
+                panel.add(fileDropPanel, BorderLayout.CENTER);
+                selectFileFrame.getContentPane().add(fileDropPanel, BorderLayout.CENTER);
+                JButton innerSelectBtn = new JButton("选择文件");
+                JPanel bottomPanel = new JPanel();
+                bottomPanel.setLayout(new FlowLayout());
+                bottomPanel.add(innerSelectBtn);
+                selectFileFrame.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
+                selectFileFrame.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
                 JFileChooser fileChooser = new JFileChooser();
-                int result = fileChooser.showOpenDialog(mainFrame);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-                    logTextArea.append("选择文件: " + filePath + "\n");
-                }
+
+                //文件工具选择文件
+                innerSelectBtn.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        int result = fileChooser.showOpenDialog(selectFileFrame);
+                        if (result == JFileChooser.APPROVE_OPTION) {
+                            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+                            logTextArea.append("选择文件: " + filePath + "\n");
+                            if (!filePath.isEmpty()) {
+                                sendFileButton.setVisible(true);
+                            }
+                        }
+                    }
+                });
             }
         });
 
         sendFileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO:发送文件
+                // TODO:发送文件，需要后端api
                 logTextArea.append("\u53d1\u9001\u6587\u4ef6\n");
             }
         });
@@ -163,6 +239,8 @@ public class ClientUI {
         // 显示窗口
         mainFrame.setVisible(true);
     }
+
+
 
 
     private void applyPortPattern(JTextField textField) {
