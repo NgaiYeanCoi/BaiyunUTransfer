@@ -52,7 +52,7 @@ public class Client extends TransferPoint {
             }
             mIn = in;
             mOut = out;
-            SwingUtilities.invokeLater(() -> mCallback.onNewConnection(address.getHostAddress(), null));
+            SwingUtilities.invokeLater(() -> mCallback.onNewConnection(Client.this, address.getHostAddress(), null));
             startPolling();
             handleRequestLoop();
         } catch (InterruptedIOException | InterruptedException e) {
@@ -65,7 +65,7 @@ public class Client extends TransferPoint {
             stopPolling();
             mIn = null;
             mOut = null;
-            SwingUtilities.invokeLater(() -> mCallback.onLostConnection(address.getHostAddress()));
+            SwingUtilities.invokeLater(() -> mCallback.onLostConnection(Client.this, address.getHostAddress()));
         }
     }
 }

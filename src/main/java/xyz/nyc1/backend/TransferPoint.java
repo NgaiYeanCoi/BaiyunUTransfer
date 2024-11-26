@@ -64,7 +64,7 @@ public abstract class TransferPoint extends Thread implements Closeable {
             DataOutputStream out = mOut;
             if (in == null || out == null) {
                 System.err.println(mTag + ": Ignore transfer request due to closed connection");
-                SwingUtilities.invokeLater(() -> mCallback.onTransferFailed(filename));
+                SwingUtilities.invokeLater(() -> mCallback.onTransferFailed(TransferPoint.this, filename));
                 return;
             }
             mReplyHandler = response -> completeSendFile(filename, mIn, mOut, response);
@@ -76,7 +76,7 @@ public abstract class TransferPoint extends Thread implements Closeable {
                 mReplyHandler = null;
                 System.err.println(mTag + ": Request failed with I/O error");
                 e.printStackTrace();
-                SwingUtilities.invokeLater(() -> mCallback.onTransferFailed(filename));
+                SwingUtilities.invokeLater(() -> mCallback.onTransferFailed(TransferPoint.this, filename));
             }
         });
     }
@@ -116,8 +116,8 @@ public abstract class TransferPoint extends Thread implements Closeable {
             System.err.println(mTag + ": Request rejected by responding " + response);
         }
         Runnable runnable = done
-                ? () -> mCallback.onTransferSuccess(null)
-                : () -> mCallback.onTransferFailed(filename);
+                ? () -> mCallback.onTransferSuccess(TransferPoint.this, null)
+                : () -> mCallback.onTransferFailed(TransferPoint.this, filename);
         SwingUtilities.invokeLater(runnable);
     }
 
@@ -142,7 +142,7 @@ public abstract class TransferPoint extends Thread implements Closeable {
                         mOut.flush();
                     } else {
                         Request req = new Request();
-                        SwingUtilities.invokeLater(() -> mCallback.onReceiveFile(filename, req));
+                        SwingUtilities.invokeLater(() -> mCallback.onReceiveFile(TransferPoint.this, filename, req));
                         if (req.await()) {
                             System.out.println(mTag + ": Accepted file transfer request");
                             acceptFile(filename);
@@ -190,11 +190,11 @@ public abstract class TransferPoint extends Thread implements Closeable {
             if (done) {
                 mOut.writeUTF(REPLY_OK);
                 mOut.flush();
-                SwingUtilities.invokeLater(() -> mCallback.onTransferSuccess(outputFile));
+                SwingUtilities.invokeLater(() -> mCallback.onTransferSuccess(TransferPoint.this, outputFile));
             } else {
                 mOut.writeUTF(REPLY_FAILED);
                 mOut.flush();
-                SwingUtilities.invokeLater(() -> mCallback.onTransferFailed(filename));
+                SwingUtilities.invokeLater(() -> mCallback.onTransferFailed(TransferPoint.this, filename));
             }
         }
     }

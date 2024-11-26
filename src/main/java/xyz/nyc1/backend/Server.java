@@ -76,7 +76,7 @@ public class Server extends TransferPoint {
             mIn = null;
             mOut = null;
             if (valid)
-                SwingUtilities.invokeLater(() -> mCallback.onLostConnection(address));
+                SwingUtilities.invokeLater(() -> mCallback.onLostConnection(Server.this, address));
         }
     }
 
@@ -87,7 +87,7 @@ public class Server extends TransferPoint {
             return false;
         }
         Request request = new Request();
-        SwingUtilities.invokeLater(() -> mCallback.onNewConnection(address, request));
+        SwingUtilities.invokeLater(() -> mCallback.onNewConnection(Server.this, address, request));
         if (!request.await()) {
             System.err.println("Server: Reject connection due to user interaction");
             mOut.writeUTF(GOODBYE);
