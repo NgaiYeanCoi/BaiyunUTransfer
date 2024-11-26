@@ -1,5 +1,7 @@
 package xyz.nyc1.backend;
 
+import java.io.File;
+
 /**
  * 回调类
  * @author canyie
@@ -18,5 +20,6 @@ public interface Callback {
      */
     void onLostConnection(String address);
     void onReceiveFile(String filename, Request request);
-    void onTransferFailed(String filename, String address);
+    void onTransferSuccess(File outputFile);
+    void onTransferFailed(String filename);
 }

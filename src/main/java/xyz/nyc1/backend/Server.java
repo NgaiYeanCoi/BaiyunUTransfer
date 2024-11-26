@@ -25,7 +25,7 @@ public class Server extends TransferPoint {
      * @throws IOException 发生 I/O 错误如对应端口被占用时触发
      */
     public Server(int port, Callback callback) throws IOException {
-        super(callback);
+        super("Server", callback);
         mServerSocket = new ServerSocket(port);
     }
 
@@ -36,6 +36,7 @@ public class Server extends TransferPoint {
         try (mServerSocket) {
             for (;;) {
                 mSocket = mServerSocket.accept();
+                startPolling();
                 handleConnection(mSocket);
                 mSocket = null;
             }
@@ -44,6 +45,8 @@ public class Server extends TransferPoint {
         } catch (IOException e) {
             System.err.println("Server: Shutting down due to unexpected error");
             e.printStackTrace();
+        } finally {
+            stopPolling();
         }
     }
 
@@ -59,39 +62,40 @@ public class Server extends TransferPoint {
              DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
              DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()))) {
             System.out.println("Server: " + address + " connected");
-            String response = in.readUTF();
-            if (!HELLO.equals(response)) {
-                System.err.println("Server: Rejecting connection due to unexpected hello line " + response);
-                return;
-            }
-            Request request = new Request();
-            SwingUtilities.invokeLater(() -> mCallback.onNewConnection(address, request));
-            if (!request.await()) {
-                System.err.println("Server: Reject connection due to user interaction");
-                out.writeUTF(GOODBYE);
-                out.flush();
-                return;
-            }
-            valid = true;
-            out.writeUTF(HELLO);
-            out.flush();
-            for (;;) {
-                response = in.readUTF();
-                if (response.equals(GOODBYE)) {
-                    System.out.println("Server: Closing connection due to client request");
-                    return;
-                } else {
-                    System.err.println("Server: Closing connection due to unexpected message " + response);
-                    return;
-                }
+            mIn = in;
+            mOut = out;
+            valid = checkConnection(address);
+            if (valid) {
+                handleRequestLoop();
             }
         } catch (IOException e) {
             System.err.println("Server: Encounter errors while communicating with client");
             e.printStackTrace();
         } finally {
             System.out.println("Server: Lost connection to address " + address);
+            mIn = null;
+            mOut = null;
             if (valid)
-                mCallback.onLostConnection(address);
+                SwingUtilities.invokeLater(() -> mCallback.onLostConnection(address));
         }
+    }
+
+    private boolean checkConnection(String address) throws InterruptedException, IOException {
+        String response = mIn.readUTF();
+        if (!HELLO.equals(response)) {
+            System.err.println("Server: Reject connection due to unexpected hello line " + response);
+            return false;
+        }
+        Request request = new Request();
+        SwingUtilities.invokeLater(() -> mCallback.onNewConnection(address, request));
+        if (!request.await()) {
+            System.err.println("Server: Reject connection due to user interaction");
+            mOut.writeUTF(GOODBYE);
+            mOut.flush();
+            return false;
+        }
+        mOut.writeUTF(HELLO);
+        mOut.flush();
+        return true;
     }
 }

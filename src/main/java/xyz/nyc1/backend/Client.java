@@ -5,8 +5,11 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.Socket;
+
+import javax.swing.SwingUtilities;
 
 /**
  * 客户端类
@@ -22,7 +25,7 @@ public class Client extends TransferPoint {
      * @throws IOException 发生 I/O 错误时抛出
      */
     public Client(String address, int port, Callback callback) throws IOException {
-        super(callback);
+        super("Client", callback);
         mSocket = new Socket(address, port);
     }
 
@@ -47,15 +50,22 @@ public class Client extends TransferPoint {
                 }
                 return;
             }
-            mCallback.onNewConnection(address.getHostAddress(), null);
-            out.writeUTF("Hello server");
-            out.flush();
+            mIn = in;
+            mOut = out;
+            SwingUtilities.invokeLater(() -> mCallback.onNewConnection(address.getHostAddress(), null));
+            startPolling();
+            handleRequestLoop();
+        } catch (InterruptedIOException | InterruptedException e) {
+            System.out.println("Client: Shutting down due to interruption");
         } catch (IOException e) {
             System.err.println("Client: Shutting down due to unexpected error");
             e.printStackTrace();
         } finally {
             System.out.println("Client: Lost connection to " + address);
-            mCallback.onLostConnection(address.getHostAddress());
+            stopPolling();
+            mIn = null;
+            mOut = null;
+            SwingUtilities.invokeLater(() -> mCallback.onLostConnection(address.getHostAddress()));
         }
     }
 }
