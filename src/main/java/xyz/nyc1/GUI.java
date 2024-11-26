@@ -1,5 +1,10 @@
 package xyz.nyc1;
 
+import xyz.nyc1.backend.Callback;
+import xyz.nyc1.backend.Client;
+import xyz.nyc1.backend.Request;
+import xyz.nyc1.backend.TransferPoint;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -54,8 +59,7 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //
-                mainFrame.dispose();
-                new ClientUI();
+
                 System.out.println("server");
             }
         });
@@ -70,7 +74,9 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //
-                System.out.println("client1");
+                mainFrame.dispose();
+                new ClientUI();
+                System.out.println("client");
             }
         });
 
@@ -83,6 +89,8 @@ public class GUI extends JFrame {
         // 显示窗口
         mainFrame.setVisible(true); // 使窗口可见
         mainFrame.setLocationRelativeTo(null);
+
+
 }
 
 }

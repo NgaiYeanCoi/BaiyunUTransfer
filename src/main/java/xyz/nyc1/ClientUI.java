@@ -33,7 +33,6 @@ public class ClientUI {
 
     private void createUI() {
 
-
         // 创建主窗口
         mainFrame = new JFrame("云移客户端");
         mainFrame.setSize(800, 600);
@@ -117,11 +116,11 @@ public class ClientUI {
 
 
                 if (port.isEmpty()){
-                    new ErrorDialog(mainFrame,"端口不能为空");
+                    new ErrorDialog(mainFrame,"\u7aef\u53e3\u4e0d\u80fd\u4e3a\u7a7a");
                 }
                 else if( Integer.parseInt(port) < 1024)
                 {
-                    new ErrorDialog(mainFrame,"端口不得小于1024");
+                    new ErrorDialog(mainFrame,"\u7aef\u53e3\u4e0d\u5f97\u5c0f\u4e8e\u0031\u0030\u0032\u0034");
                 }
                 else {
                     // TODO:添加连接服务器的代码，需要连接后端API
@@ -157,7 +156,7 @@ public class ClientUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO:发送文件
-                logTextArea.append("发送文件\n");
+                logTextArea.append("\u53d1\u9001\u6587\u4ef6\n");
             }
         });
 
