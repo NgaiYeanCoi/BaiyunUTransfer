@@ -54,8 +54,7 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //
-                mainFrame.dispose();
-                new ClientUI();
+
                 System.out.println("server");
             }
         });
@@ -70,7 +69,9 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //
-                System.out.println("client1");
+                mainFrame.dispose();
+                new ClientUI();
+                System.out.println("client");
             }
         });
 

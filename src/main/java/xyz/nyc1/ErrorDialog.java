@@ -2,6 +2,9 @@ package xyz.nyc1;
 
 import javax.swing.*;
 import java.awt.*;
+/**
+ * @author NgaiYeanCoi,canyie,Aasling
+ * */
 
 public class ErrorDialog {
     /**
