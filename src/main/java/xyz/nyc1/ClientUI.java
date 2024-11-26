@@ -10,10 +10,9 @@ import java.awt.event.ActionListener;
  * @author NgaiYeanCoi,canyie,Aasling
  * */
 
-
 public class ClientUI {
     /**
-     * 客户端端UI界面
+     * 客户端UI界面
      */
 
     private JFrame mainFrame;
@@ -33,6 +32,8 @@ public class ClientUI {
     }
 
     private void createUI() {
+
+
         // 创建主窗口
         mainFrame = new JFrame("云移服务端");
         mainFrame.setSize(800, 600);
