@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
@@ -159,6 +160,11 @@ public abstract class TransferPoint extends Thread implements Closeable {
             }
         } catch (EOFException e) {
             System.err.println(mTag + ": Socket closed by opposite");
+        } catch (SocketException e) {
+            if (e.toString().contains("Connection reset"))
+                System.err.println(mTag + ": Socket closed by opposite");
+            else
+                throw e;
         }
     }
 
@@ -184,9 +190,10 @@ public abstract class TransferPoint extends Thread implements Closeable {
                 mOut.flush();
             }
         } catch (IOException e) {
-            System.err.println("Server: Transfer failed due to I/O error");
+            System.err.println(mTag + ": Transfer failed due to I/O error");
             e.printStackTrace();
         } finally {
+            System.out.println(mTag + ": Transfer completed");
             if (done) {
                 mOut.writeUTF(REPLY_OK);
                 mOut.flush();
@@ -233,7 +240,6 @@ public abstract class TransferPoint extends Thread implements Closeable {
     private class ActionPollingThread extends Thread {
         ActionPollingThread() {
             super(mTag + "-ActionPollingThread");
-            System.out.println(getName());
             setPriority(MAX_PRIORITY);
         }
 
