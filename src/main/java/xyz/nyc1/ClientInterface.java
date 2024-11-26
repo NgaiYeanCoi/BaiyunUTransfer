@@ -28,9 +28,12 @@ public class ClientInterface extends JFrame {
         TextFieldPort = new JTextField();
         connectIPaddressLabel = new JLabel();
         textField1 = new JTextField();
+        button2 = new JButton();
+        button1 = new JButton();
 
         //======== this ========
         setTitle("\u4e91\u79fb\u5ba2\u6237\u7aef");
+        setMinimumSize(new Dimension(400, 300));
         var contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
@@ -60,26 +63,43 @@ public class ClientInterface extends JFrame {
 
         //======== center ========
         {
-            center.setLayout(new BorderLayout());
+            center.setLayout(new BorderLayout(5, 5));
 
             //---- label2 ----
             label2.setText("\u8fde\u63a5\u4fe1\u606f");
-            label2.setHorizontalAlignment(SwingConstants.LEFT);
+            label2.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 16));
+            label2.setAlignmentY(1.5F);
+            label2.setAlignmentX(1.0F);
+            label2.setIconTextGap(5);
             center.add(label2, BorderLayout.NORTH);
 
             //======== connectInfo ========
             {
-                connectInfo.setLayout(new FlowLayout(FlowLayout.LEFT));
+                connectInfo.setMinimumSize(new Dimension(800, 44));
+                connectInfo.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 15));
+                ((FlowLayout)connectInfo.getLayout()).setAlignOnBaseline(true);
 
                 //---- connectPortLabel ----
                 connectPortLabel.setText("\u7aef\u53e3\uff1a");
                 connectInfo.add(connectPortLabel);
+
+                //---- TextFieldPort ----
+                TextFieldPort.setMinimumSize(new Dimension(200, 34));
                 connectInfo.add(TextFieldPort);
 
                 //---- connectIPaddressLabel ----
                 connectIPaddressLabel.setText("IP\u5730\u5740:");
                 connectInfo.add(connectIPaddressLabel);
                 connectInfo.add(textField1);
+
+                //---- button2 ----
+                button2.setText("text");
+                button2.setMaximumSize(new Dimension(60, 34));
+                connectInfo.add(button2);
+
+                //---- button1 ----
+                button1.setText("text");
+                connectInfo.add(button1);
             }
             center.add(connectInfo, BorderLayout.CENTER);
         }
@@ -101,5 +121,7 @@ public class ClientInterface extends JFrame {
     private JTextField TextFieldPort;
     private JLabel connectIPaddressLabel;
     private JTextField textField1;
+    private JButton button2;
+    private JButton button1;
     // JFormDesigner - End of variables declaration  //GEN-END:variables  @formatter:on
 }

@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "8.2.4.0.393" Java: "17.0.11" encoding: "UTF-8"
+JFDML JFormDesigner: "8.2.4.0.393" Java: "21.0.3" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
@@ -6,6 +6,7 @@ new FormModel {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 			name: "this"
 			"title": "云移客户端"
+			"minimumSize": new java.awt.Dimension( 400, 300 )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 				name: "panel1"
 			}, new FormLayoutConstraints( class java.lang.String ) {
@@ -26,25 +27,36 @@ new FormModel {
 			}, new FormLayoutConstraints( class java.lang.String ) {
 				"value": "South"
 			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) {
+				"hgap": 5
+				"vgap": 5
+			} ) {
 				name: "center"
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "label2"
 					"text": "连接信息"
-					"horizontalAlignment": 2
+					"font": new java.awt.Font( "Microsoft YaHei UI", 0, 16 )
+					"alignmentY": 1.5f
+					"alignmentX": 1.0f
+					"iconTextGap": 5
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "North"
 				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) {
+					"vgap": 15
+					"hgap": 20
+					"alignOnBaseline": true
 					"alignment": 0
 				} ) {
 					name: "connectInfo"
+					"minimumSize": new java.awt.Dimension( 800, 44 )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "connectPortLabel"
 						"text": "端口："
 					} )
 					add( new FormComponent( "javax.swing.JTextField" ) {
 						name: "TextFieldPort"
+						"minimumSize": new java.awt.Dimension( 200, 34 )
 					} )
 					add( new FormComponent( "javax.swing.JLabel" ) {
 						name: "connectIPaddressLabel"
@@ -52,6 +64,15 @@ new FormModel {
 					} )
 					add( new FormComponent( "javax.swing.JTextField" ) {
 						name: "textField1"
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "button2"
+						"text": "text"
+						"maximumSize": new java.awt.Dimension( 60, 34 )
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "button1"
+						"text": "text"
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "Center"

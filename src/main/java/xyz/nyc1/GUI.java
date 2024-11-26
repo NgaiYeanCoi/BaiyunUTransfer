@@ -17,6 +17,7 @@ public class GUI extends JFrame {
     public static void creatGUI(){
     // 创建主窗口
         JFrame mainFrame = new JFrame("云移");
+        //mainFrame.setDefaultLookAndFeelDecorated(true);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭操作
         mainFrame.setSize(400, 300);
         mainFrame.setResizable(false); // 禁止窗口调整大小
@@ -53,6 +54,9 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //
+                mainFrame.dispose();
+                ClientInterface clientInterface = new ClientInterface();
+                clientInterface.setVisible(true);
                 System.out.println("server");
             }
         });
