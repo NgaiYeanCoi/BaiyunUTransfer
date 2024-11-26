@@ -1,8 +1,6 @@
 package xyz.nyc1;
-import xyz.nyc1.backend.Server;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,61 +14,6 @@ import java.awt.event.ComponentEvent;
 
 
 public class GUI extends JFrame {
-    public static void creatClientGUI() {
-        // 创建主窗口
-        JFrame serverFrame = new JFrame("云服务端");
-        serverFrame.setSize(800, 600);
-        serverFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        serverFrame.setLocationRelativeTo(null);
-        serverFrame.setResizable(false);
-
-        // 创建面板
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 2, 10, 10)); // 使用网格布局
-
-        // 创建标签和文本框
-        JLabel ipLabel = new JLabel("IP\u5730\u5740:");
-        JTextField ipTextField = new JTextField();
-        JLabel portLabel = new JLabel("端口:");
-        JTextField portTextField = new JTextField();
-
-        // 创建按钮
-        JButton connectButton = new JButton("连接");
-        JButton disconnectButton = new JButton("断开连接");
-
-        // 添加组件到面板
-        panel.add(ipLabel);
-        panel.add(ipTextField);
-        panel.add(portLabel);
-        panel.add(portTextField);
-        panel.add(connectButton);
-        panel.add(disconnectButton);
-
-        // 添加面板到窗口
-        serverFrame.add(panel);
-
-        // 添加按钮事件监听器
-        connectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String ip = ipTextField.getText();
-                String port = portTextField.getText();
-                // 这里可以添加连接服务器的代码
-                JOptionPane.showMessageDialog(serverFrame, "连接到 " + ip + ":" + port);
-            }
-        });
-
-        disconnectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // 这里可以添加断开连接的代码
-                JOptionPane.showMessageDialog(serverFrame, "断开连接");
-            }
-        });
-
-        // 显示窗口
-        serverFrame.setVisible(true);
-    }
     public static void creatMainGUI(){
     // 创建主窗口
         JFrame mainFrame = new JFrame("云移");
@@ -112,7 +55,7 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //
                 mainFrame.dispose();
-                creatClientGUI();
+                new ClientUI();
                 System.out.println("server");
             }
         });
