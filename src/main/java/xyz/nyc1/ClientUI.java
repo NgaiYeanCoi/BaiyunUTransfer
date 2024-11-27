@@ -1,5 +1,9 @@
 package xyz.nyc1;
 
+import xyz.nyc1.backend.Callback;
+import xyz.nyc1.backend.Request;
+import xyz.nyc1.backend.TransferPoint;
+
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
@@ -18,7 +22,7 @@ import java.util.List;
  * @author NgaiYeanCoi,canyie,Aasling
  * */
 
-public class ClientUI {
+public class ClientUI implements Callback {
     /**
      * 瀹㈡埛绔疷I鐣岄潰
      */
@@ -39,8 +43,8 @@ public class ClientUI {
         createUI();
     }
 
-    private void createUI() {
 
+    private void createUI() {
         // 创建主窗口
         mainFrame = new JFrame("BaiyunUTransferClient");
         mainFrame.setSize(800, 600);
@@ -142,6 +146,8 @@ public class ClientUI {
                 }
                 else {
                     // TODO:添加连接服务器的代码，需要连接后端API
+
+
 
                     logTextArea.append("正在连接到 " + ip + ":" + port + "中...\n");
                     logTextArea.append("已成功连接！\n");
@@ -326,5 +332,31 @@ public class ClientUI {
 
         // 获取textField的Document并设置DocumentFilter
         ((AbstractDocument) textField.getDocument()).setDocumentFilter(filter);
+    }
+
+    @Override
+    public void onNewConnection(TransferPoint transferPoint, String address, Request request) {
+        request.accept();
+        request.decline();
+    }
+
+    @Override
+    public void onLostConnection(TransferPoint transferPoint, String address) {
+
+    }
+
+    @Override
+    public void onReceiveFile(TransferPoint transferPoint, String filename, Request request) {
+
+    }
+
+    @Override
+    public void onTransferSuccess(TransferPoint transferPoint, File outputFile) {
+
+    }
+
+    @Override
+    public void onTransferFailed(TransferPoint transferPoint, String filename) {
+
     }
 }
