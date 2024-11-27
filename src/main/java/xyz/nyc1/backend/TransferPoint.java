@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
@@ -49,6 +53,8 @@ public abstract class TransferPoint extends Thread implements Closeable {
     private ActionPollingThread mActionThread;
     /** 处理回应消息的回调 */
     private volatile Consumer<String> mReplyHandler;
+    /** 下载到的路径 */
+    private Path mBaseDownloadPath;
     /** 处理事件的回调 */
     final Callback mCallback;
     /** 建立的和对端的连接 */
@@ -75,6 +81,18 @@ public abstract class TransferPoint extends Thread implements Closeable {
      */
     public boolean isConnected() {
         return mSocket != null && mSocket.isConnected();
+    }
+
+    /**
+     * 设置下载到哪个文件夹 此文件夹必须存在
+     * @param dir 目标文件夹
+     */
+    public void setDownloadDir(File dir) {
+        try {
+            mBaseDownloadPath = dir.toPath().toRealPath(LinkOption.NOFOLLOW_LINKS);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Invalid dir: " + dir, e);
+        }
     }
 
     /**
@@ -182,7 +200,9 @@ public abstract class TransferPoint extends Thread implements Closeable {
                 } else if (FILE_REQUEST.equals(request)) {
                     System.out.println(mTag + ": New incoming file transfer request");
                     String filename = mIn.readUTF();
-                    if (filename.isEmpty() || filename.contains("/") || filename.contains("\\")) {
+                    // 检查是否会发生严重的安全违规，如果发生，立即终止
+                    if (invalidFilename(filename)) {
+                        // EventLog.writeEvent(0x534e4554, "", -1, filename);
                         System.err.println(mTag + ": Reject request due to invalid file name " + filename);
                         mOut.writeUTF(REPLY_DECLINE);
                         mOut.flush();
@@ -221,9 +241,9 @@ public abstract class TransferPoint extends Thread implements Closeable {
     private void acceptFile(String filename) throws IOException {
         mOut.writeUTF(REPLY_OK);
         mOut.flush();
+        File outputFile = generateOutputFile(filename);
         byte[] buf = new byte[8192];
         boolean done = false;
-        File outputFile = new File(filename);
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
             for (;;) {
                 // 读取本次传输的长度
@@ -257,9 +277,46 @@ public abstract class TransferPoint extends Thread implements Closeable {
             } else {
                 mOut.writeUTF(REPLY_FAILED);
                 mOut.flush();
+                outputFile.delete();
                 SwingUtilities.invokeLater(() -> mCallback.onTransferFailed(TransferPoint.this, filename));
             }
         }
+    }
+
+    private boolean invalidFilename(String filename) {
+        if (mBaseDownloadPath == null)
+            throw new NullPointerException("for security reasons, set a base download dir");
+        // 阻止可能的路径穿越攻击
+        if (filename.isEmpty() || filename.contains("/") || filename.contains("\\"))
+            return true;
+        // 额外的路径穿越检查
+        Path path = mBaseDownloadPath.resolve(filename).normalize();
+        return !path.startsWith(mBaseDownloadPath);
+    }
+
+    private File generateOutputFile(String filename) throws IOException {
+        int dot = filename.lastIndexOf(".");
+        for (int i = 0;i != -1;i++) {
+            String generated;
+            if (i == 0) {
+                generated = filename;
+            } else {
+                if (dot == -1)
+                    generated = filename + "(" + i + ")";
+                else
+                    generated = filename.substring(0, dot) + "(" + i + ")" + filename.substring(dot);
+            }
+            Path path = mBaseDownloadPath.resolve(generated).normalize();
+            // 尝试创建文件以检查文件是否存在
+            // 使用 NIO 的 createFile 是为了检测 path 指向一个存在的符号链接但是链接指向的文件不存在的情况以阻止意外写入其他文件
+            try {
+                Files.createFile(path);
+                return path.toFile();
+            } catch (FileAlreadyExistsException ignored) {
+                // 文件存在，尝试下一个
+            }
+        }
+        throw new IllegalStateException("No available filename for " + filename);
     }
 
     /**
