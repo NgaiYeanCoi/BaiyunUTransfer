@@ -21,12 +21,12 @@ import java.awt.event.ComponentEvent;
 public class GUI extends JFrame {
     public static void creatMainGUI(){
     // 创建主窗口
-        JFrame mainFrame = new JFrame("云移");
+        JFrame mainFrame = new JFrame("BaiyunUTransfer");
         //mainFrame.setDefaultLookAndFeelDecorated(true);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭操作
         mainFrame.setSize(400, 300);
         mainFrame.setResizable(false); // 禁止窗口调整大小
-        mainFrame.getContentPane().setBackground(new Color(240, 240, 240)); // 设置窗口的背景颜色浅灰色背景
+        mainFrame.getContentPane().setBackground(new Color(255, 255, 255)); // 设置窗口的背景颜色白色色背景
         mainFrame.addComponentListener(new ComponentAdapter() { // 使窗口始终保持居中
             @Override
             public void componentResized(ComponentEvent e) {
@@ -42,7 +42,7 @@ public class GUI extends JFrame {
         mainFrame.setBackground(Color.white);
 
         // 创建标签
-        JLabel label1 = new JLabel("\u8bf7\u9009\u62e9\u4f60\u7684\u6a21\u5f0f");
+        JLabel label1 = new JLabel("请选择你的模式");
         label1.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 20));
         mainFrame.getContentPane().add(label1);
         label1.setBounds(125, 30, 150, 40);
@@ -51,9 +51,9 @@ public class GUI extends JFrame {
 
 
         //---- serverBtn ----
-        JButton serverBtn = new JButton("\u670d\u52a1\u7aef");
+        JButton serverBtn = new JButton("我是第一台设备");
         mainFrameContentPane.add(serverBtn);
-        serverBtn.setBounds(new Rectangle(new Point(155, 100), serverBtn.getPreferredSize()));
+        serverBtn.setBounds(new Rectangle(new Point(135, 100), serverBtn.getPreferredSize()));
         //serverBtn点击事件
         serverBtn.addActionListener(new ActionListener() {
             @Override
@@ -66,9 +66,9 @@ public class GUI extends JFrame {
 
 
         //---- clientBtn ----
-        JButton clientBtn = new JButton("\u5ba2\u6237\u7aef");
+        JButton clientBtn = new JButton("我是第二台设备");
         mainFrameContentPane.add(clientBtn);
-        clientBtn.setBounds(new Rectangle(new Point(155, 155), clientBtn.getPreferredSize()));
+        clientBtn.setBounds(new Rectangle(new Point(135, 155), clientBtn.getPreferredSize()));
         //clientBtn点击事件
         clientBtn.addActionListener(new ActionListener() {
             @Override
