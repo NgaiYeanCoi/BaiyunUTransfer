@@ -24,7 +24,7 @@ import java.util.List;
 
 public class ClientUI implements Callback {
     /**
-     * 瀹㈡埛绔疷I鐣岄潰
+     * 客户端UI界面
      */
 
     private JFrame mainFrame;
@@ -38,6 +38,8 @@ public class ClientUI implements Callback {
     private JButton disconnectButton;
     private JButton selectFileButton;
     private JButton sendFileButton;
+    private JButton cancelSelectedButton;
+    private String globalfilePath;
 
     public ClientUI() {
         createUI();
@@ -81,8 +83,9 @@ public class ClientUI implements Callback {
         // 创建按钮
         connectButton = new JButton("连接");
         disconnectButton = new JButton("断开连接");
-        selectFileButton = new JButton("选择发送的文件");
+        selectFileButton = new JButton("选择发送文件");
         sendFileButton = new JButton("确认发送");
+        cancelSelectedButton = new JButton("取消选择");
 
         // 添加组件到顶部面板
         // IPv4输入面板
@@ -113,11 +116,13 @@ public class ClientUI implements Callback {
         bottomPanel.setLayout(new FlowLayout());
         bottomPanel.add(selectFileButton);
         bottomPanel.add(sendFileButton);
+        bottomPanel.add(cancelSelectedButton);
 
         // 初始为不可见
         sendFileButton.setVisible(false);
         selectFileButton.setVisible(false);
         disconnectButton.setVisible(false);
+        cancelSelectedButton.setVisible(false);
 
         // 添加面板到主面板
         panel.add(topPanel, BorderLayout.NORTH);
@@ -126,6 +131,7 @@ public class ClientUI implements Callback {
 
         // 添加主面板到窗口
         mainFrame.add(panel);
+
 
         // 添加连接按钮事件监听器
         connectButton.addActionListener(new ActionListener() {
@@ -172,10 +178,15 @@ public class ClientUI implements Callback {
                 selectFileButton.setVisible(false);
                 sendFileButton.setVisible(false);
                 connectButton.setVisible(true);
+                cancelSelectedButton.setVisible(false);
+                globalfilePath = null;
             }
         });
 
         selectFileButton.addActionListener(new ActionListener() {
+            /**
+            * 新增模态化，选择文件发送的窗口
+             * */
             @Override
             public void actionPerformed(ActionEvent e) {
                  // 创建模态化文件选择窗口
@@ -191,23 +202,7 @@ public class ClientUI implements Callback {
                 fileDropPanel.setPreferredSize(new Dimension(400, 200));
                 fileDropPanel.setLayout(new BorderLayout());
 
-            // 设置拖放目标
-            new DropTarget(fileDropPanel, DnDConstants.ACTION_COPY_OR_MOVE, new DropTargetAdapter() {
-                public void drop(DropTargetDropEvent evt) {
-                    try {
-                        evt.acceptDrop(DnDConstants.ACTION_COPY);
-                        Transferable transferable = evt.getTransferable();
-                        if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                            List<File> files = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-                            for (File file : files) {
-                                logTextArea.append(file + "\n");
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+
 
             // 布局界面
             JPanel panel = new JPanel();
@@ -215,25 +210,57 @@ public class ClientUI implements Callback {
             panel.add(fileDropPanel, BorderLayout.CENTER);
             selectFileFrame.getContentPane().add(fileDropPanel, BorderLayout.CENTER);
 
+             //按钮控件
             JButton innerSelectBtn = new JButton("选择文件");
-            JButton InnerSelectConfirmBtn = new JButton("确定");
             JPanel bottomPanel = new JPanel();
             bottomPanel.setLayout(new FlowLayout());
             bottomPanel.add(innerSelectBtn);
             selectFileFrame.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
-
             JFileChooser fileChooser = new JFileChooser();
 
-            // 文件选择按钮事件
+
+                // 设置拖放目标
+                new DropTarget(fileDropPanel, DnDConstants.ACTION_COPY_OR_MOVE, new DropTargetAdapter() {
+                    public void drop(DropTargetDropEvent evt) {
+                        try {
+                            evt.acceptDrop(DnDConstants.ACTION_COPY);
+                            Transferable transferable = evt.getTransferable();
+                            if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                                List<File> files = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                                if(files.size()==1){
+                                    File file = files.get(0);
+                                    globalfilePath = file.getAbsolutePath();
+                                    logTextArea.append("已选择文件 "+globalfilePath + "\n");
+                                    selectFileFrame.dispose();
+                                    selectFileButton.setVisible(false);
+                                    cancelSelectedButton.setVisible(true);
+                                    sendFileButton.setVisible(true);
+
+                                }
+                                else{
+                                    new ErrorDialog(selectFileFrame,"一次只能发送一个文件,请重新操作！");
+                                    evt.rejectDrop();
+
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+            // 内部视窗文件选择按钮呼出文件浏览器
             innerSelectBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     int result = fileChooser.showOpenDialog(selectFileFrame);
                     if (result == JFileChooser.APPROVE_OPTION) {
-                        String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-                        logTextArea.append("选择文件: " + filePath + "\n");
-                        if (!filePath.isEmpty()) {
-                            //TODO:
+                        globalfilePath = fileChooser.getSelectedFile().getAbsolutePath();
+                        logTextArea.append("已选择文件: " + globalfilePath + "\n");
+                        if (!globalfilePath.isEmpty()) {
+                            selectFileFrame.dispose();
+                            selectFileButton.setVisible(false);
+                            cancelSelectedButton.setVisible(true);
                             sendFileButton.setVisible(true);
                         }
                     }
@@ -244,6 +271,9 @@ public class ClientUI implements Callback {
     selectFileFrame.setVisible(true);
             }
         });
+
+
+
 
         sendFileButton.addActionListener(new ActionListener() {
             @Override
