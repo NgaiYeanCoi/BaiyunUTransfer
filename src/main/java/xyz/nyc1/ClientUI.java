@@ -276,10 +276,31 @@ public class ClientUI implements Callback {
 
 
         sendFileButton.addActionListener(new ActionListener() {
+            /**
+            *  发送文件按钮监听事件
+            * */
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO:发送文件，需要后端api
                 logTextArea.append("发送文件\n");
+            }
+        });
+
+
+        cancelSelectedButton.addActionListener(new ActionListener() {
+            /**
+             *  "取消选择"按钮监听事件
+             * */
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                logTextArea.append("已取消选取文件"+globalfilePath+"\n");
+                globalfilePath = null;
+                selectFileButton.setVisible(true);
+                sendFileButton.setVisible(false);
+                cancelSelectedButton.setVisible(false);
+
+
+
             }
         });
 
