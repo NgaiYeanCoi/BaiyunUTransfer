@@ -8,7 +8,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author canyie
  */
 public class Request {
+    /** 内部计数器 */
     private final CountDownLatch countDownLatch = new CountDownLatch(1);
+    /** 保存结果 */
     private final AtomicBoolean result = new AtomicBoolean();
 
     /**

@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
  * @author canyie
  */
 public class Server extends TransferPoint {
+    /** 服务连接 */
     private final ServerSocket mServerSocket;
 
     /**
@@ -55,7 +56,7 @@ public class Server extends TransferPoint {
      * @param socket 连接
      * @throws InterruptedException 当服务线程被中断时抛出
      */
-    private void handleConnection(final Socket socket) throws InterruptedException {
+    private void handleConnection(final Socket socket) throws InterruptedException, InterruptedIOException {
         boolean valid = false;
         String address = socket.getInetAddress().getHostAddress();
         try (socket;
@@ -68,6 +69,10 @@ public class Server extends TransferPoint {
             if (valid) {
                 handleRequestLoop();
             }
+        } catch (InterruptedIOException e) {
+            // 此线程已经被中断，重新向上抛出以终止整个服务器
+            System.out.println("Server: Interrupted while communicating with client, rethrowing");
+            throw e;
         } catch (IOException e) {
             System.err.println("Server: Encounter errors while communicating with client");
             e.printStackTrace();
@@ -80,6 +85,13 @@ public class Server extends TransferPoint {
         }
     }
 
+    /**
+     * 有新连接时调用此方法进行基础握手 以检查客户端是否正确
+     * @param address 对端地址
+     * @return 此连接是否有效 返回 false 会导致此连接被抛弃
+     * @throws InterruptedException 若线程被中断
+     * @throws IOException 若发生 I/O 错误
+     */
     private boolean checkConnection(String address) throws InterruptedException, IOException {
         String response = mIn.readUTF();
         if (!HELLO.equals(response)) {

@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
@@ -21,23 +22,40 @@ import javax.swing.SwingUtilities;
  * @author canyie
  */
 public abstract class TransferPoint extends Thread implements Closeable {
+    /** 协议：握手 */
     static final String HELLO = "BaiyunUTransferProtocol/1.0 HELLO";
+    /** 协议：握手 */
     static final String GOODBYE = "GOODBYE";
+    /** 协议：请求头 */
     static final String REQUEST = "REQUEST ";
+    /** 协议：响应头 */
     static final String REPLY = "REPLY ";
+    /** 协议：文件传输请求头 后续应该以 writeUTF 格式写入文件名 */
     static final String FILE_REQUEST = REQUEST + "TRANSFER FILE";
+    /** 协议：响应头 表示同意请求或请求成功完成 */
     static final String REPLY_OK = REPLY + "OKAY";
+    /** 协议：响应头 表示拒绝请求 */
     static final String REPLY_DECLINE = REPLY + "DENY";
+    /** 协议：响应头 表示请求尚未完成 请对端继续操作 */
     static final String REPLY_CONTINUE = REPLY + "CONT";
+    /** 协议：响应头 表示请求失败 */
     static final String REPLY_FAILED = REPLY + "FAIL";
 
-    private final BlockingQueue<Runnable> mActionQueue = new LinkedBlockingQueue<>();
+    /** 当前传输点的标签 可以是 {@link Server} 也可以是 {@link Client} */
     private final String mTag;
-    final Callback mCallback;
+    /** 事件队列 被 {@link ActionPollingThread} 使用 */
+    private final BlockingQueue<Runnable> mActionQueue = new LinkedBlockingQueue<>();
+    /** 事件队列 被 {@link ActionPollingThread} 使用 */
     private ActionPollingThread mActionThread;
+    /** 处理回应消息的回调 */
     private volatile Consumer<String> mReplyHandler;
+    /** 处理事件的回调 */
+    final Callback mCallback;
+    /** 建立的和对端的连接 */
     Socket mSocket;
+    /** 和对端的连接的输入流 */
     DataInputStream mIn;
+    /** 和对端的连接的输出流 */
     DataOutputStream mOut;
 
     /**
@@ -59,6 +77,10 @@ public abstract class TransferPoint extends Thread implements Closeable {
         return mSocket != null && mSocket.isConnected();
     }
 
+    /**
+     * 异步发送文件
+     * @param filename 文件全路径
+     */
     public void sendFile(String filename) {
         mActionQueue.add(() -> {
             DataInputStream in = mIn;
@@ -68,47 +90,66 @@ public abstract class TransferPoint extends Thread implements Closeable {
                 SwingUtilities.invokeLater(() -> mCallback.onTransferFailed(TransferPoint.this, filename));
                 return;
             }
-            mReplyHandler = response -> completeSendFile(filename, mIn, mOut, response);
+            File file = new File(filename);
+            mReplyHandler = response -> completeSendFile(file, mIn, mOut, response);
             try {
+                // 请求发送文件
                 mOut.writeUTF(FILE_REQUEST);
-                mOut.writeUTF(new File(filename).getName());
+                mOut.writeUTF(file.getName());
                 mOut.flush();
             } catch (IOException e) {
                 mReplyHandler = null;
-                System.err.println(mTag + ": Request failed with I/O error");
-                e.printStackTrace();
+                if (e instanceof InterruptedIOException) {
+                    System.err.println(mTag + ": Request aborted due to interruption");
+                    Thread.currentThread().interrupt();
+                } else {
+                    System.err.println(mTag + ": Request failed with I/O error");
+                    e.printStackTrace();
+                }
                 SwingUtilities.invokeLater(() -> mCallback.onTransferFailed(TransferPoint.this, filename));
             }
         });
     }
 
-    private void completeSendFile(String filename, DataInputStream in, DataOutputStream out, String response) {
+    /**
+     * 处理发送文件请求的响应，并完成剩余步骤
+     * @param file 传输的文件
+     * @param in 连接输入流
+     * @param out 连接输出流
+     * @param response 对端响应行
+     */
+    private void completeSendFile(File file, DataInputStream in, DataOutputStream out, String response) {
         boolean done = false;
         if (REPLY_OK.equals(response)) {
-            try (FileInputStream fis = new FileInputStream(filename)) {
+            try (FileInputStream fis = new FileInputStream(file)) {
                 byte[] buf = new byte[8192];
                 for (;;) {
                     int len = fis.read(buf);
                     if (len < 0) {
-                        mOut.writeInt(0);
-                        mOut.flush();
+                        // 文件已经读完
+                        out.writeInt(0);
+                        out.flush();
                         break;
                     } else if (len == 0) {
+                        // 读取失败，直接重试，不告知对端
                         continue;
                     } else {
-                        mOut.writeInt(len);
-                        mOut.write(buf, 0, len);
-                        mOut.flush();
+                        out.writeInt(len);
+                        out.write(buf, 0, len);
+                        out.flush();
                     }
-                    response = mIn.readUTF();
+                    response = in.readUTF();
                     if (!response.equals(REPLY_CONTINUE)) {
                         System.err.println(mTag + ": Request interrupted by responding " + response);
                         return;
                     }
                 }
-                response = mIn.readUTF();
+                response = in.readUTF();
                 System.err.println(mTag + ": Request completed with " + response);
                 done = REPLY_OK.equals(response);
+            } catch (InterruptedIOException e) {
+                System.err.println(mTag + ": Request aborted due to interruption");
+                Thread.currentThread().interrupt();
             } catch (IOException e) {
                 System.err.println(mTag + ": Request failed with I/O error");
                 e.printStackTrace();
@@ -118,10 +159,15 @@ public abstract class TransferPoint extends Thread implements Closeable {
         }
         Runnable runnable = done
                 ? () -> mCallback.onTransferSuccess(TransferPoint.this, null)
-                : () -> mCallback.onTransferFailed(TransferPoint.this, filename);
+                : () -> mCallback.onTransferFailed(TransferPoint.this, file.getName());
         SwingUtilities.invokeLater(runnable);
     }
 
+    /**
+     * 进入事件处理主循环 等待对端发送消息 仅当连接被关闭时返回
+     * @throws InterruptedException 如线程被中断
+     * @throws IOException 若发生 I/O 错误
+     */
     public void handleRequestLoop() throws InterruptedException, IOException {
         // Listen for client requests
         try {
@@ -136,8 +182,7 @@ public abstract class TransferPoint extends Thread implements Closeable {
                 } else if (FILE_REQUEST.equals(request)) {
                     System.out.println(mTag + ": New incoming file transfer request");
                     String filename = mIn.readUTF();
-                    if (filename == null || filename.isEmpty()
-                            || filename.contains("/") || filename.contains("\\")) {
+                    if (filename.isEmpty() || filename.contains("/") || filename.contains("\\")) {
                         System.err.println(mTag + ": Reject request due to invalid file name " + filename);
                         mOut.writeUTF(REPLY_DECLINE);
                         mOut.flush();
@@ -168,6 +213,11 @@ public abstract class TransferPoint extends Thread implements Closeable {
         }
     }
 
+    /**
+     * 同意接收文件
+     * @param filename 文件名
+     * @throws IOException 若发生 I/O 错误
+     */
     private void acceptFile(String filename) throws IOException {
         mOut.writeUTF(REPLY_OK);
         mOut.flush();
@@ -176,11 +226,14 @@ public abstract class TransferPoint extends Thread implements Closeable {
         File outputFile = new File(filename);
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
             for (;;) {
+                // 读取本次传输的长度
                 int length = mIn.readInt();
                 if (length == 0) {
+                    // 文件已经读完
                     done = true;
                     break;
                 } else if (length < 0 || length > buf.length) {
+                    // 非法请求，拒绝
                     System.err.println("Server: Rejecting transfer request due to bad length " + length);
                     break;
                 }
@@ -189,9 +242,12 @@ public abstract class TransferPoint extends Thread implements Closeable {
                 mOut.writeUTF(REPLY_CONTINUE);
                 mOut.flush();
             }
+        } catch (InterruptedIOException e) {
+            System.err.println(mTag + ": Transfer aborted due to interruption");
+            throw e;
         } catch (IOException e) {
             System.err.println(mTag + ": Transfer failed due to I/O error");
-            e.printStackTrace();
+            throw e;
         } finally {
             System.out.println(mTag + ": Transfer completed");
             if (done) {
@@ -206,11 +262,17 @@ public abstract class TransferPoint extends Thread implements Closeable {
         }
     }
 
+    /**
+     * 启动消息循环子线程
+     */
     public void startPolling() {
         mActionThread = new ActionPollingThread();
         mActionThread.start();
     }
 
+    /**
+     * 终止消息循环子线程
+     */
     public void stopPolling() {
         ActionPollingThread thread = mActionThread;
         if (thread != null) {
@@ -237,6 +299,9 @@ public abstract class TransferPoint extends Thread implements Closeable {
         }
     }
 
+    /**
+     * 事件处理循环子线程 循环执行 {@link TransferPoint#mActionQueue} 中的所有任务
+     */
     private class ActionPollingThread extends Thread {
         ActionPollingThread() {
             super(mTag + "-ActionPollingThread");
