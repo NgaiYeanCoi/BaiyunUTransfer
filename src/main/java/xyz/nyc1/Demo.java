@@ -11,31 +11,29 @@ public class Demo {
 
     public static void DemoTest() {
 
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // ÉèÖÃ´°¿Ú¹Ø±Õ²Ù×÷
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // è®¾ç½®çª—å£å…³é—­æ“ä½œ
         mainFrame.setSize(400, 300);
-        mainFrame.setResizable(false); // ½ûÖ¹´°¿Úµ÷Õû´óĞ¡
+        mainFrame.setResizable(false); // ç¦æ­¢çª—å£è°ƒæ•´å¤§å°
         mainFrame.setLocationRelativeTo(null);
-        mainFrame.getContentPane().setBackground(new Color(255, 255, 255)); // ÉèÖÃ´°¿ÚµÄ±³¾°ÑÕÉ«Îª°×É«
+        mainFrame.getContentPane().setBackground(new Color(255, 255, 255)); // è®¾ç½®çª—å£çš„èƒŒæ™¯é¢œè‰²ä¸ºç™½è‰²
 
 
-
-
-        // ´´½¨Ä£Ì¬¶Ô»°¿ò
-        JDialog receiveFileRequestDialog = new JDialog(mainFrame, "½ÓÊÕÎÄ¼ş", true); // ÉèÖÃÎªÄ£Ì¬
+        // åˆ›å»ºæ¨¡æ€å¯¹è¯æ¡†
+        JDialog receiveFileRequestDialog = new JDialog(mainFrame, "æ¥æ”¶æ–‡ä»¶", true); // è®¾ç½®ä¸ºæ¨¡æ€
         receiveFileRequestDialog.setSize(600, 400);
-        receiveFileRequestDialog.setLocationRelativeTo(null); // ¾ÓÖĞÏÔÊ¾
-        receiveFileRequestDialog.setResizable(false); // ½ûÖ¹µ÷Õû´óĞ¡
-        receiveFileRequestDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE); // ÉèÖÃ¹Ø±Õ²Ù×÷
-        receiveFileRequestDialog.setLayout(new BorderLayout()); // ÉèÖÃ²¼¾Ö
+        receiveFileRequestDialog.setLocationRelativeTo(null); // å±…ä¸­æ˜¾ç¤º
+        receiveFileRequestDialog.setResizable(false); // ç¦æ­¢è°ƒæ•´å¤§å°
+        receiveFileRequestDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE); // è®¾ç½®å…³é—­æ“ä½œ
+        receiveFileRequestDialog.setLayout(new BorderLayout()); // è®¾ç½®å¸ƒå±€
         receiveFileRequestDialog.setBackground(new Color(255, 255, 255));
 
-        //´´½¨Ö÷Panel
+        //åˆ›å»ºä¸»Panel
         JPanel mainPanel = new JPanel();
         mainPanel.setBackground(new Color(255, 255, 255));
         mainPanel.setLayout(new BorderLayout());
 
 
-        //centerÃæ°å
+        //centeré¢æ¿
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(new Color(255, 255, 255));
         JLabel receiveInfoLabel = new JLabel();
@@ -44,27 +42,26 @@ public class Demo {
         receiveInfoLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 30));
         String ipPort ;
         ipPort="127.0.0.1:10086";
-        receiveInfoLabel.setText(ipPort+"ÏëÒª·¢ËÍ¸øÄãÒ»¸öÎÄ¼ş");
+        receiveInfoLabel.setText(ipPort + "æƒ³è¦å‘é€ç»™ä½ ä¸€ä¸ªæ–‡ä»¶");
 
 
-
-        //°´Å¥¿Ø¼ş
-            JButton receiveAcceptBtn = new JButton("½ÓÊÕ");
-            JButton receiveDeclineBtn = new JButton("¾Ü¾ø");
-        //µ×²¿Ãæ°å
+        //æŒ‰é’®æ§ä»¶
+        JButton receiveAcceptBtn = new JButton("æ¥æ”¶");
+        JButton receiveDeclineBtn = new JButton("æ‹’ç»");
+        //åº•éƒ¨é¢æ¿
             JPanel bottomPanel = new JPanel();
             bottomPanel.setLayout(new FlowLayout());
             bottomPanel.add(receiveAcceptBtn);
             bottomPanel.add(receiveDeclineBtn);
-        //Ìí¼Ó½øÖ÷Ãæ°å
+        //æ·»åŠ è¿›ä¸»é¢æ¿
             mainPanel.add(centerPanel, BorderLayout.CENTER);
             mainPanel.add(bottomPanel, BorderLayout.SOUTH);
             receiveFileRequestDialog.add(mainPanel);
 
-        // ÏÔÊ¾Ö÷¿ò¼Ü
+        // æ˜¾ç¤ºä¸»æ¡†æ¶
         mainFrame.setVisible(true);
 
-        // ÏÔÊ¾¶Ô»°¿ò
+        // æ˜¾ç¤ºå¯¹è¯æ¡†
         receiveFileRequestDialog.setVisible(true);
 
 

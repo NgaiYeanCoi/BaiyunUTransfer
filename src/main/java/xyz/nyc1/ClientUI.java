@@ -24,7 +24,7 @@ import java.util.List;
 
 public class ClientUI implements Callback {
     /**
-     * ¿Í»§¶ËUI½çÃæ
+     * å®¢æˆ·ç«¯UIç•Œé¢
      */
 
 
@@ -50,48 +50,48 @@ public class ClientUI implements Callback {
     private void createUI() {
 
 
-        // ´´½¨Ö÷´°¿Ú
+        // åˆ›å»ºä¸»çª—å£
         mainFrame = new JFrame("BaiyunUTransferClient");
         mainFrame.setSize(800, 600);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setResizable(false);
-        mainFrame.getContentPane().setBackground(new Color(255, 255, 255)); // ÉèÖÃ´°¿ÚµÄ±³¾°ÑÕÉ«°×É«±³¾°
+        mainFrame.getContentPane().setBackground(new Color(255, 255, 255)); // è®¾ç½®çª—å£çš„èƒŒæ™¯é¢œè‰²ç™½è‰²èƒŒæ™¯
 
-        // ´´½¨Ãæ°å
+        // åˆ›å»ºé¢æ¿
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        // ´´½¨¶¥²¿Ãæ°å
+        // åˆ›å»ºé¡¶éƒ¨é¢æ¿
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout());
 
-        // ´´½¨IPV4¿Ø¼ş
-        JLabel ipLabel = new JLabel("IPµØÖ·:");
+        // åˆ›å»ºIPV4æ§ä»¶
+        JLabel ipLabel = new JLabel("IPåœ°å€:");
         ipSegment1 = new JTextField(3);
         ipSegment2 = new JTextField(3);
         ipSegment3 = new JTextField(3);
         ipSegment4 = new JTextField(3);
 
-        // ´«ÈëapplyIPSegmentPattern¼ì²éÊäÈë
+        // ä¼ å…¥applyIPSegmentPatternæ£€æŸ¥è¾“å…¥
         applyIPSegmentPattern(ipSegment1);
         applyIPSegmentPattern(ipSegment2);
         applyIPSegmentPattern(ipSegment3);
         applyIPSegmentPattern(ipSegment4);
 
-        JLabel portLabel = new JLabel("¶Ë¿Ú:");
+        JLabel portLabel = new JLabel("ç«¯å£:");
         portTextField = new JTextField(5);
         applyPortPattern(portTextField);
 
-        // ´´½¨°´Å¥
-        connectButton = new JButton("Á¬½Ó");
-        disconnectButton = new JButton("¶Ï¿ªÁ¬½Ó");
-        selectFileButton = new JButton("Ñ¡Ôñ·¢ËÍÎÄ¼ş");
-        sendFileButton = new JButton("È·ÈÏ·¢ËÍ");
-        cancelSelectedButton = new JButton("È¡ÏûÑ¡Ôñ");
+        // åˆ›å»ºæŒ‰é’®
+        connectButton = new JButton("è¿æ¥");
+        disconnectButton = new JButton("æ–­å¼€è¿æ¥");
+        selectFileButton = new JButton("é€‰æ‹©å‘é€æ–‡ä»¶");
+        sendFileButton = new JButton("ç¡®è®¤å‘é€");
+        cancelSelectedButton = new JButton("å–æ¶ˆé€‰æ‹©");
 
-        // Ìí¼Ó×é¼şµ½¶¥²¿Ãæ°å
-        // IPv4ÊäÈëÃæ°å
+        // æ·»åŠ ç»„ä»¶åˆ°é¡¶éƒ¨é¢æ¿
+        // IPv4è¾“å…¥é¢æ¿
         topPanel.add(ipLabel);
         topPanel.add(ipSegment1);
         topPanel.add(new JLabel("."));
@@ -100,66 +100,64 @@ public class ClientUI implements Callback {
         topPanel.add(ipSegment3);
         topPanel.add(new JLabel("."));
         topPanel.add(ipSegment4);
-        // ¶Ë¿ÚÊäÈëÃæ°å
+        // ç«¯å£è¾“å…¥é¢æ¿
         topPanel.add(portLabel);
         topPanel.add(portTextField);
-        // °´Å¥Ãæ°å
+        // æŒ‰é’®é¢æ¿
         topPanel.add(connectButton);
         topPanel.add(disconnectButton);
 
 
-
-        // ´´½¨ÈÕÖ¾ÎÄ±¾ÇøÓò
+        // åˆ›å»ºæ—¥å¿—æ–‡æœ¬åŒºåŸŸ
         logTextArea = new JTextArea();
         logTextArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(logTextArea);
 
-        // ´´½¨µ×²¿Ãæ°å
+        // åˆ›å»ºåº•éƒ¨é¢æ¿
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout());
         bottomPanel.add(selectFileButton);
         bottomPanel.add(sendFileButton);
         bottomPanel.add(cancelSelectedButton);
 
-        // ³õÊ¼Îª²»¿É¼û
+        // åˆå§‹ä¸ºä¸å¯è§
         sendFileButton.setVisible(false);
         selectFileButton.setVisible(false);
         disconnectButton.setVisible(false);
         cancelSelectedButton.setVisible(false);
 
-        // Ìí¼ÓÃæ°åµ½Ö÷Ãæ°å
+        // æ·»åŠ é¢æ¿åˆ°ä¸»é¢æ¿
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(bottomPanel, BorderLayout.SOUTH);
 
-        // Ìí¼ÓÖ÷Ãæ°åµ½´°¿Ú
+        // æ·»åŠ ä¸»é¢æ¿åˆ°çª—å£
         mainFrame.add(panel);
 
 
-        // Ìí¼ÓÁ¬½Ó°´Å¥ÊÂ¼ş¼àÌıÆ÷
+        // æ·»åŠ è¿æ¥æŒ‰é’®äº‹ä»¶ç›‘å¬å™¨
         connectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String ip = ipSegment1.getText() + "." + ipSegment2.getText() + "." + ipSegment3.getText() + "." + ipSegment4.getText();
                 String port = portTextField.getText();
-                // ÅĞ¶ÏipÒÔ¼°portµÄºÏ·¨ĞÔ
+                // åˆ¤æ–­ipä»¥åŠportçš„åˆæ³•æ€§
                 if((ipSegment1.getText().isEmpty()) || ipSegment2.getText().isEmpty()||ipSegment3.getText().isEmpty()||ipSegment4.getText().isEmpty()) {
-                    new ErrorDialog(mainFrame, "IPµØÖ·²»ÄÜÎª¿Õ£¡");
+                    new ErrorDialog(mainFrame, "IPåœ°å€ä¸èƒ½ä¸ºç©ºï¼");
                 }
                 else if(port.isEmpty()){
-                    new ErrorDialog(mainFrame,"¶Ë¿Ú²»ÄÜÎª¿Õ");
+                    new ErrorDialog(mainFrame, "ç«¯å£ä¸èƒ½ä¸ºç©º");
                 }
                 else if( Integer.parseInt(port) < 1024)
                 {
-                    new ErrorDialog(mainFrame,"¶Ë¿Ú²»µÃĞ¡ÓÚ1024");
+                    new ErrorDialog(mainFrame, "ç«¯å£ä¸å¾—å°äº1024");
                 }
                 else {
-                    // TODO:Ìí¼ÓÁ¬½Ó·şÎñÆ÷µÄ´úÂë£¬ĞèÒªÁ¬½Óºó¶ËAPI
+                    // TODO:æ·»åŠ è¿æ¥æœåŠ¡å™¨çš„ä»£ç ï¼Œéœ€è¦è¿æ¥åç«¯API
 
 
-
-                    logTextArea.append("ÕıÔÚÁ¬½Óµ½ " + ip + ":" + port + "ÖĞ...\n");
-                    logTextArea.append("ÒÑ³É¹¦Á¬½Ó£¡\n");
+                    logTextArea.append("æ­£åœ¨è¿æ¥åˆ° " + ip + ":" + port + "ä¸­...\n");
+                    logTextArea.append("å·²æˆåŠŸè¿æ¥ï¼\n");
                     connectButton.setVisible(false);
                     selectFileButton.setVisible(true);
                     disconnectButton.setVisible(true);
@@ -175,8 +173,8 @@ public class ClientUI implements Callback {
             public void actionPerformed(ActionEvent e) {
                 String ip = ipSegment1.getText() + "." + ipSegment2.getText() + "." + ipSegment3.getText();
                 String port = portTextField.getText();
-                // TODO:¶Ï¿ªÁ¬½Ó£¬ĞèÒªºó¶Ëapi
-                logTextArea.append(ip + ":"+ port +" ÒÑ¶Ï¿ªÁ¬½Ó\n");
+                // TODO:æ–­å¼€è¿æ¥ï¼Œéœ€è¦åç«¯api
+                logTextArea.append(ip + ":" + port + " å·²æ–­å¼€è¿æ¥\n");
                 disconnectButton.setVisible(false);
                 selectFileButton.setVisible(false);
                 sendFileButton.setVisible(false);
@@ -188,33 +186,32 @@ public class ClientUI implements Callback {
 
         selectFileButton.addActionListener(new ActionListener() {
             /**
-            * ĞÂÔöÄ£Ì¬»¯£¬Ñ¡ÔñÎÄ¼ş·¢ËÍµÄ´°¿Ú
+             * æ–°å¢æ¨¡æ€åŒ–ï¼Œé€‰æ‹©æ–‡ä»¶å‘é€çš„çª—å£
              * */
             @Override
             public void actionPerformed(ActionEvent e) {
-                 // ´´½¨Ä£Ì¬»¯ÎÄ¼şÑ¡Ôñ´°¿Ú
-                JDialog selectFileDialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(mainFrame), "Ñ¡ÔñÎÄ¼ş", true);
+                // åˆ›å»ºæ¨¡æ€åŒ–æ–‡ä»¶é€‰æ‹©çª—å£
+                JDialog selectFileDialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(mainFrame), "é€‰æ‹©æ–‡ä»¶", true);
                 selectFileDialog.setSize(400, 300);
                 selectFileDialog.setLocationRelativeTo(null);
                 selectFileDialog.setResizable(false);
                 selectFileDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
                 selectFileDialog.setLayout(new BorderLayout());
-                // ´´½¨ÎÄ¼şÍÏ·ÅÃæ°å
+                // åˆ›å»ºæ–‡ä»¶æ‹–æ”¾é¢æ¿
                 JPanel fileDropPanel = new JPanel();
-                fileDropPanel.setBorder(BorderFactory.createTitledBorder("ÍÏ·ÅÎÄ¼şµ½´Ë´¦"));
+                fileDropPanel.setBorder(BorderFactory.createTitledBorder("æ‹–æ”¾æ–‡ä»¶åˆ°æ­¤å¤„"));
                 fileDropPanel.setPreferredSize(new Dimension(400, 200));
                 fileDropPanel.setLayout(new BorderLayout());
 
 
-
-            // ²¼¾Ö½çÃæ
+                // å¸ƒå±€ç•Œé¢
             JPanel panel = new JPanel();
             panel.setLayout(new BorderLayout());
             panel.add(fileDropPanel, BorderLayout.CENTER);
             selectFileDialog.getContentPane().add(fileDropPanel, BorderLayout.CENTER);
 
-             //°´Å¥¿Ø¼ş
-            JButton innerSelectBtn = new JButton("Ñ¡ÔñÎÄ¼ş");
+                //æŒ‰é’®æ§ä»¶
+                JButton innerSelectBtn = new JButton("é€‰æ‹©æ–‡ä»¶");
             JPanel bottomPanel = new JPanel();
             bottomPanel.setLayout(new FlowLayout());
             bottomPanel.add(innerSelectBtn);
@@ -222,7 +219,7 @@ public class ClientUI implements Callback {
             JFileChooser fileChooser = new JFileChooser();
 
 
-                // ÉèÖÃÍÏ·ÅÄ¿±ê
+                // è®¾ç½®æ‹–æ”¾ç›®æ ‡
                 new DropTarget(fileDropPanel, DnDConstants.ACTION_COPY_OR_MOVE, new DropTargetAdapter() {
                     public void drop(DropTargetDropEvent evt) {
                         try {
@@ -233,7 +230,7 @@ public class ClientUI implements Callback {
                                 if(files.size()==1){
                                     File file = files.get(0);
                                     globalfilePath = file.getAbsolutePath();
-                                    logTextArea.append("ÒÑÑ¡ÔñÎÄ¼ş "+globalfilePath + "\n");
+                                    logTextArea.append("å·²é€‰æ‹©æ–‡ä»¶ " + globalfilePath + "\n");
                                     selectFileDialog.dispose();
                                     selectFileButton.setVisible(false);
                                     cancelSelectedButton.setVisible(true);
@@ -241,7 +238,7 @@ public class ClientUI implements Callback {
 
                                 }
                                 else{
-                                    new ErrorDialog(selectFileDialog,"Ò»´ÎÖ»ÄÜ·¢ËÍÒ»¸öÎÄ¼ş,ÇëÖØĞÂ²Ù×÷£¡");
+                                    new ErrorDialog(selectFileDialog, "ä¸€æ¬¡åªèƒ½å‘é€ä¸€ä¸ªæ–‡ä»¶,è¯·é‡æ–°æ“ä½œï¼");
                                     evt.rejectDrop();
 
                                 }
@@ -252,14 +249,14 @@ public class ClientUI implements Callback {
                     }
                 });
 
-            // ÄÚ²¿ÊÓ´°ÎÄ¼şÑ¡Ôñ°´Å¥ºô³öÎÄ¼şä¯ÀÀÆ÷
+                // å†…éƒ¨è§†çª—æ–‡ä»¶é€‰æ‹©æŒ‰é’®å‘¼å‡ºæ–‡ä»¶æµè§ˆå™¨
             innerSelectBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     int result = fileChooser.showOpenDialog(selectFileDialog);
                     if (result == JFileChooser.APPROVE_OPTION) {
                         globalfilePath = fileChooser.getSelectedFile().getAbsolutePath();
-                        logTextArea.append("ÒÑÑ¡ÔñÎÄ¼ş: " + globalfilePath + "\n");
+                        logTextArea.append("å·²é€‰æ‹©æ–‡ä»¶: " + globalfilePath + "\n");
                         if (!globalfilePath.isEmpty()) {
                             selectFileDialog.dispose();
                             selectFileButton.setVisible(false);
@@ -270,7 +267,7 @@ public class ClientUI implements Callback {
                 }
             });
 
-    // ÏÔÊ¾´°¿Ú
+                // æ˜¾ç¤ºçª—å£
     selectFileDialog.setVisible(true);
             }
         });
@@ -280,23 +277,23 @@ public class ClientUI implements Callback {
 
         sendFileButton.addActionListener(new ActionListener() {
             /**
-            *  ·¢ËÍÎÄ¼ş°´Å¥¼àÌıÊÂ¼ş
+             *  å‘é€æ–‡ä»¶æŒ‰é’®ç›‘å¬äº‹ä»¶
             * */
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO:·¢ËÍÎÄ¼ş£¬ĞèÒªºó¶Ëapi
-                logTextArea.append("·¢ËÍÎÄ¼ş\n");
+                // TODO:å‘é€æ–‡ä»¶ï¼Œéœ€è¦åç«¯api
+                logTextArea.append("å‘é€æ–‡ä»¶\n");
             }
         });
 
 
         cancelSelectedButton.addActionListener(new ActionListener() {
             /**
-             *  "È¡ÏûÑ¡Ôñ"°´Å¥¼àÌıÊÂ¼ş
+             *  "å–æ¶ˆé€‰æ‹©"æŒ‰é’®ç›‘å¬äº‹ä»¶
              * */
             @Override
             public void actionPerformed(ActionEvent e) {
-                logTextArea.append("ÒÑÈ¡ÏûÑ¡È¡ÎÄ¼ş"+globalfilePath+"\n");
+                logTextArea.append("å·²å–æ¶ˆé€‰å–æ–‡ä»¶" + globalfilePath + "\n");
                 globalfilePath = null;
                 selectFileButton.setVisible(true);
                 sendFileButton.setVisible(false);
@@ -307,7 +304,7 @@ public class ClientUI implements Callback {
             }
         });
 
-        // ÏÔÊ¾´°¿Ú
+        // æ˜¾ç¤ºçª—å£
         mainFrame.setVisible(true);
     }
 
@@ -324,7 +321,7 @@ public class ClientUI implements Callback {
 
     @Override
     public void onReceiveFile(TransferPoint transferPoint, String filename, Request request) {
-         JDialog receiveFileRequest = new JDialog((JFrame) SwingUtilities.getWindowAncestor(mainFrame), "½ÓÊÕÎÄ¼ş", true);
+        JDialog receiveFileRequest = new JDialog((JFrame) SwingUtilities.getWindowAncestor(mainFrame), "æ¥æ”¶æ–‡ä»¶", true);
          receiveFileRequest.setSize(400, 300);
          receiveFileRequest.setLocationRelativeTo(null);
          receiveFileRequest.setResizable(false);
@@ -350,12 +347,12 @@ public class ClientUI implements Callback {
 
     private void applyPortPattern(JTextField textField) {
         /* *
-         * ¶Ë¿ÚºÅÊäÈëÕıÔò±í´ïÆ¥Åä¼ì²é
+         * ç«¯å£å·è¾“å…¥æ­£åˆ™è¡¨è¾¾åŒ¹é…æ£€æŸ¥
          * */
-        // ´´½¨Ò»¸ö¶Ë¿ÚºÅµÄ²¿·ÖÊäÈëÕıÔò±í´ïÊ½
+        // åˆ›å»ºä¸€ä¸ªç«¯å£å·çš„éƒ¨åˆ†è¾“å…¥æ­£åˆ™è¡¨è¾¾å¼
         String portPattern = "^\\d{1,5}$";
 
-        // ´´½¨Ò»¸öDocumentFilterÀ´¹ıÂËÊäÈë
+        // åˆ›å»ºä¸€ä¸ªDocumentFilteræ¥è¿‡æ»¤è¾“å…¥
         DocumentFilter filter = new DocumentFilter() {
             @Override
             public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
@@ -382,16 +379,16 @@ public class ClientUI implements Callback {
             }
         };
 
-        // »ñÈ¡textFieldµÄDocument²¢ÉèÖÃDocumentFilter
+        // è·å–textFieldçš„Documentå¹¶è®¾ç½®DocumentFilter
         ((AbstractDocument) textField.getDocument()).setDocumentFilter(filter);
     }
     private void applyIPSegmentPattern(JTextField textField) {
         /* *
-         * IPv4¶ÎµÄÕıÔò±í´ïÆ¥Åä
+         * IPv4æ®µçš„æ­£åˆ™è¡¨è¾¾åŒ¹é…
          * */
         String ipSegmentPattern = "^(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$";
 
-        // ´´½¨Ò»¸öDocumentFilterÀ´¹ıÂËÊäÈë
+        // åˆ›å»ºä¸€ä¸ªDocumentFilteræ¥è¿‡æ»¤è¾“å…¥
         DocumentFilter filter = new DocumentFilter() {
             @Override
             public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
@@ -418,7 +415,7 @@ public class ClientUI implements Callback {
             }
         };
 
-        // »ñÈ¡textFieldµÄDocument²¢ÉèÖÃDocumentFilter
+        // è·å–textFieldçš„Documentå¹¶è®¾ç½®DocumentFilter
         ((AbstractDocument) textField.getDocument()).setDocumentFilter(filter);
     }
 

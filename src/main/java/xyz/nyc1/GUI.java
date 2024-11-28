@@ -20,29 +20,29 @@ import java.awt.event.ComponentEvent;
 
 public class GUI extends JFrame {
     public static void creatMainGUI(){
-    // ´´½¨Ö÷´°¿Ú
+        // åˆ›å»ºä¸»çª—å£
         JFrame mainFrame = new JFrame("BaiyunUTransfer");
         //mainFrame.setDefaultLookAndFeelDecorated(true);
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // ÉèÖÃ´°¿Ú¹Ø±Õ²Ù×÷
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // è®¾ç½®çª—å£å…³é—­æ“ä½œ
         mainFrame.setSize(400, 300);
-        mainFrame.setResizable(false); // ½ûÖ¹´°¿Úµ÷Õû´óĞ¡
-        mainFrame.getContentPane().setBackground(new Color(255, 255, 255)); // ÉèÖÃ´°¿ÚµÄ±³¾°ÑÕÉ«°×É«É«±³¾°
-        mainFrame.addComponentListener(new ComponentAdapter() { // Ê¹´°¿ÚÊ¼ÖÕ±£³Ö¾ÓÖĞ
+        mainFrame.setResizable(false); // ç¦æ­¢çª—å£è°ƒæ•´å¤§å°
+        mainFrame.getContentPane().setBackground(new Color(255, 255, 255)); // è®¾ç½®çª—å£çš„èƒŒæ™¯é¢œè‰²ç™½è‰²è‰²èƒŒæ™¯
+        mainFrame.addComponentListener(new ComponentAdapter() { // ä½¿çª—å£å§‹ç»ˆä¿æŒå±…ä¸­
             @Override
             public void componentResized(ComponentEvent e) {
                 mainFrame.setLocationRelativeTo(null);
             }
         });
 
-        //-- ÉèÖÃmainFrameÈİÆ÷
+        //-- è®¾ç½®mainFrameå®¹å™¨
         var mainFrameContentPane = mainFrame.getContentPane();
-            mainFrameContentPane.setLayout(null);   // Ê¹ÓÃ¾ø¶Ô²¼¾Ö
+        mainFrameContentPane.setLayout(null);   // ä½¿ç”¨ç»å¯¹å¸ƒå±€
 
 
         mainFrame.setBackground(Color.white);
 
-        // ´´½¨±êÇ©
-        JLabel label1 = new JLabel("ÇëÑ¡ÔñÄãµÄÄ£Ê½");
+        // åˆ›å»ºæ ‡ç­¾
+        JLabel label1 = new JLabel("è¯·é€‰æ‹©ä½ çš„æ¨¡å¼");
         label1.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 20));
         mainFrame.getContentPane().add(label1);
         label1.setBounds(125, 30, 150, 40);
@@ -51,10 +51,10 @@ public class GUI extends JFrame {
 
 
         //---- serverBtn ----
-        JButton serverBtn = new JButton("ÎÒÊÇµÚÒ»Ì¨Éè±¸");
+        JButton serverBtn = new JButton("æˆ‘æ˜¯ç¬¬ä¸€å°è®¾å¤‡");
         mainFrameContentPane.add(serverBtn);
         serverBtn.setBounds(new Rectangle(new Point(135, 100), serverBtn.getPreferredSize()));
-        //serverBtnµã»÷ÊÂ¼ş
+        //serverBtnç‚¹å‡»äº‹ä»¶
         serverBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -66,10 +66,10 @@ public class GUI extends JFrame {
 
 
         //---- clientBtn ----
-        JButton clientBtn = new JButton("ÎÒÊÇµÚ¶şÌ¨Éè±¸");
+        JButton clientBtn = new JButton("æˆ‘æ˜¯ç¬¬äºŒå°è®¾å¤‡");
         mainFrameContentPane.add(clientBtn);
         clientBtn.setBounds(new Rectangle(new Point(135, 155), clientBtn.getPreferredSize()));
-        //clientBtnµã»÷ÊÂ¼ş
+        //clientBtnç‚¹å‡»äº‹ä»¶
         clientBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -81,13 +81,11 @@ public class GUI extends JFrame {
         });
 
 
-
-
-        // ÉèÖÃ²¼¾Ö¹ÜÀíÆ÷Îªnull£¬ÒÔ±ãÊ¹ÓÃ¾ø¶Ô¶¨Î»
+        // è®¾ç½®å¸ƒå±€ç®¡ç†å™¨ä¸ºnullï¼Œä»¥ä¾¿ä½¿ç”¨ç»å¯¹å®šä½
         mainFrame.setLayout(null);
 
-        // ÏÔÊ¾´°¿Ú
-        mainFrame.setVisible(true); // Ê¹´°¿Ú¿É¼û
+        // æ˜¾ç¤ºçª—å£
+        mainFrame.setVisible(true); // ä½¿çª—å£å¯è§
         mainFrame.setLocationRelativeTo(null);
 
 
