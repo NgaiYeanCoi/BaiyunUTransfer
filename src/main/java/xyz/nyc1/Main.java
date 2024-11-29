@@ -14,7 +14,7 @@ public class Main {
             public void run() {
                 //GUI.creatMainGUI(); 暂时弃用，但保留
                 new ClientUI();
-                //receiveRequestUI.DemoTest();
+                //ReceiveRequestUI.DemoTest();
             }
         });
     }

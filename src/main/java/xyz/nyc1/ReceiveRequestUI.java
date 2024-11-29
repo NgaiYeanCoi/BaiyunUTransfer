@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
 
-public class receiveRequestUI {
+public class ReceiveRequestUI {
     static JFrame mainFrame = new JFrame("test");
 
 
@@ -40,7 +40,7 @@ public class receiveRequestUI {
 
         // 添加电脑图片
         centerPanel.add(Box.createVerticalStrut(90)); //设置垂直间距
-        Image computerImage = new ImageIcon(Objects.requireNonNull(receiveRequestUI.class.getResource("/images/computerIcon.png"))).getImage();//获取图片
+        Image computerImage = new ImageIcon(Objects.requireNonNull(ReceiveRequestUI.class.getResource("/images/computerIcon.png"))).getImage();//获取图片
         ImageIcon computerIcon = new ImageIcon(ImageReset.resizeImage(computerImage, 133, 93));//重定图片大小
         JLabel imageLabel = new JLabel(computerIcon);
         imageLabel.setSize(computerIcon.getIconWidth(), computerIcon.getIconHeight()); //设置标签的长宽为Icon的长宽
@@ -68,14 +68,14 @@ public class receiveRequestUI {
 
         // 接受按钮控件
         JButton receiveAcceptBtn = new JButton();
-        Image receiveAcceptBtnImage = new ImageIcon(Objects.requireNonNull(receiveRequestUI.class.getResource("/images/acceptBtnIcon.png"))).getImage();
+        Image receiveAcceptBtnImage = new ImageIcon(Objects.requireNonNull(ReceiveRequestUI.class.getResource("/images/acceptBtnIcon.png"))).getImage();
         setBtnImage(receiveAcceptBtn, receiveAcceptBtnImage,89,40);
 
 
 
         // 拒绝按钮控件
         JButton receiveRejectBtn = new JButton();
-        Image receiveRejectBtnImage = new ImageIcon(Objects.requireNonNull(receiveRequestUI.class.getResource("/images/rejectBtnIcon.png"))).getImage();
+        Image receiveRejectBtnImage = new ImageIcon(Objects.requireNonNull(ReceiveRequestUI.class.getResource("/images/rejectBtnIcon.png"))).getImage();
         setBtnImage(receiveRejectBtn, receiveRejectBtnImage,89,40);
 
         // 底部面板
