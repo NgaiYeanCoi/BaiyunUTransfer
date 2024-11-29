@@ -69,12 +69,13 @@ public class ClientUI implements Callback {
             rightLogo.setFont(new Font("Microsoft YaHei UI", Font.BOLD, 25));
             rightLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
             leftPanel.add(rightLogo);
-            leftPanel.add(Box.createVerticalStrut(20)); //设置垂直间距
+            leftPanel.add(Box.createVerticalStrut(40)); //设置垂直间距
             //创建接收按钮组件
             JButton rightReceiveBtn = new JButton("接收");
             rightReceiveBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
             leftPanel.add(rightReceiveBtn);
-
+            leftPanel.add(Box.createVerticalStrut(45)); //设置垂直间距
+            //接收监听事件
             rightReceiveBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -82,6 +83,12 @@ public class ClientUI implements Callback {
                     System.out.println("接收");
                 }
             });
+            //创建发送按钮控件
+            JButton rightSendBtn = new JButton("发送");
+            rightSendBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            leftPanel.add(rightSendBtn);
+            leftPanel.add(Box.createVerticalStrut(45));
+
 
         // 将左侧栏添加到主面板的左侧
         mainPanel.add(leftPanel, BorderLayout.WEST);
