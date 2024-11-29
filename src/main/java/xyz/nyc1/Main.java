@@ -12,8 +12,9 @@ public class Main {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                //GUI.creatMainGUI();
-                Demo.DemoTest();
+                //GUI.creatMainGUI(); 暂时弃用，但保留
+                new ClientUI();
+                //receiveRequestUI.DemoTest();
             }
         });
     }

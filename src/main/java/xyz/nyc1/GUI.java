@@ -1,9 +1,5 @@
 package xyz.nyc1;
 
-import xyz.nyc1.backend.Callback;
-import xyz.nyc1.backend.Client;
-import xyz.nyc1.backend.Request;
-import xyz.nyc1.backend.TransferPoint;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +9,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 /**
- * @author NgaiYeanCoi,canyie,Aasling
+ * @author NgaiYeanCoi
+ * 暂时弃用，做保留
  * */
 
 
