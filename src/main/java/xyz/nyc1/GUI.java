@@ -72,7 +72,7 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //
                 mainFrame.dispose();
-                new ClientUI();
+                new mainUI();
                 System.out.println("client");
             }
         });
