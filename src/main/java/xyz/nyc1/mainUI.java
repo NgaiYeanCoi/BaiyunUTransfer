@@ -50,7 +50,6 @@ public class mainUI {
     private JButton cancelSelectedButton;
     /*接收面板*/
     private JTextArea receiveLogTextArea;
-    private JTextField receivePortTextField;
     private JButton receiveListenButton;
 
 
@@ -168,10 +167,12 @@ public class mainUI {
         // 创建日志文本区域
         sendLogTextArea = new JTextArea();
         sendLogTextArea.setEditable(false);
-        JScrollPane centerScrollPane = new JScrollPane(sendLogTextArea);
-        centerScrollPane.setPreferredSize(new Dimension(0, 400)); // 设置滚动面板的首选大小
+        JScrollPane sendCenterScrollPane = new JScrollPane(sendLogTextArea);
+        sendCenterScrollPane.setBorder(null);
+        sendCenterScrollPane.setPreferredSize(new Dimension(0, 400)); // 设置滚动面板的首选大小
         // 添加面板到右侧面板
-        rightSendPanel.add(centerScrollPane,BorderLayout.CENTER);
+        rightSendPanel.add(sendCenterScrollPane,BorderLayout.CENTER);
+        rightSendPanel.add(Box.createVerticalStrut(10));
         // 创建底部面板
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout());
@@ -397,9 +398,13 @@ public class mainUI {
         rightReceivePanel.add(receiveTopPanel, BorderLayout.NORTH);
 
         // 创建日志文本区域
+
         receiveLogTextArea = new JTextArea();
         receiveLogTextArea.setEditable(false);
-        rightReceivePanel.add(receiveLogTextArea);
+        JScrollPane receiveCenterScrollPane = new JScrollPane(receiveLogTextArea);
+        receiveCenterScrollPane.setPreferredSize(new Dimension(0, 400)); // 设置滚动面板的首选大小
+        receiveCenterScrollPane.setBorder(null);
+        rightReceivePanel.add(receiveCenterScrollPane);
         // 添加监听按钮事件监听器
         receiveListenButton.addActionListener(new ActionListener() {
             @Override
