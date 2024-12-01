@@ -1,5 +1,9 @@
 package xyz.nyc1;
 
+import xyz.nyc1.backend.Callback;
+import xyz.nyc1.backend.Request;
+import xyz.nyc1.backend.TransferPoint;
+
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -18,6 +22,7 @@ import java.io.File;
 import java.net.URI;
 import java.awt.Desktop;
 import java.util.List;
+import java.util.Objects;
 
 import static xyz.nyc1.NetworkIpInterface.getHostIPs;
 
@@ -25,7 +30,7 @@ import static xyz.nyc1.NetworkIpInterface.getHostIPs;
  * @author NgaiYeanCoi
  * */
 
-public class mainUI {
+public class mainUI implements Callback {
     /**
      * 主要的UI界面
      */
@@ -36,8 +41,8 @@ public class mainUI {
     private CardLayout cardLayout;
     private JPanel centerPanel;
     private String currentCard = "default";
-    private String mainColor = "#e7ecf3";
-    private String viceColor = "#f5f7fa";
+    private String mainColor = "#e6eef2";
+    private String viceColor = "#f0f7fa";
     /*发送面板*/
     private JTextField ipSegment1;
     private JTextField ipSegment2;
@@ -78,9 +83,17 @@ public class mainUI {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setResizable(false);
+        ImageIcon icon32 = new ImageIcon(Objects.requireNonNull(mainUI.class.getResource("/images/icon32x32.png")));
+        mainFrame.setIconImage(icon32.getImage());
 
         // 创建主面板
         mainPanel = new JPanel(new BorderLayout());
+
+        // 定义按钮的样式
+        UIManager.put("Button.font",new Font("Microsoft YaHei UI",Font.PLAIN,12));
+        //UIManager.put("Button.background", Color.LIGHT_GRAY); // 设置背景颜色
+        //UIManager.put("Button.foreground", Color.BLACK); // 设置前景颜色（文字颜色）
+        //UIManager.put("Button.border", BorderFactory.createLineBorder(Color.BLACK, 1)); // 设置边框
 
         // 创建左侧栏面板
         leftPanel = new JPanel();
@@ -550,7 +563,8 @@ public class mainUI {
         addSettingLabel("修改主题颜色");
         JComboBox<String>selectStyleBox=new JComboBox<>();
         selectStyleBox.addItem("默认");
-        selectStyleBox.addItem("白色");//TODO：可添加其他主题颜色
+        selectStyleBox.addItem("亮白");//TODO：可添加其他主题颜色
+        selectStyleBox.addItem("樱花粉");
         settingGbc.gridx = 1;
         settingGbc.weightx = 0.0; // 按钮不需要额外空间
         settingCenterPanel.add(selectStyleBox, settingGbc);
@@ -560,17 +574,19 @@ public class mainUI {
             public void actionPerformed(ActionEvent e) {
                 String  selectedItem=(String)selectStyleBox.getSelectedItem();
                 if("默认".equals(selectedItem)) {
-                    mainColor = "#e7ecf3";
-                    viceColor = "#f5f7fa";
+                    mainColor = "#e6eef2";
+                    viceColor = "#f0f7fa";
                     changeStyle(mainColor,viceColor);
-                    System.out.println("默认");
                 }
-                else if("白色".equals(selectedItem))
-                {
+                else if("亮白".equals(selectedItem)) {
                     mainColor = "#ffffff";
                     viceColor = "#f8f9fa";
                     changeStyle(mainColor,viceColor);
-                    System.out.println("白色");
+                }
+                else if ("樱花粉".equals(selectedItem)) {
+                    mainColor = "#f2e1ed";
+                    viceColor = "#faf2f7";
+                    changeStyle(mainColor,viceColor);
                 }
             }
         });
@@ -726,6 +742,31 @@ public class mainUI {
         settingPanel.setBackground(Color.decode(viceColor));
         settingTopPanel.setBackground(Color.decode(viceColor));
         settingCenterPanel.setBackground(Color.decode(viceColor));
+
+    }
+
+    @Override
+    public void onNewConnection(TransferPoint transferPoint, String address, Request request) {
+
+    }
+
+    @Override
+    public void onLostConnection(TransferPoint transferPoint, String address) {
+
+    }
+
+    @Override
+    public void onReceiveFile(TransferPoint transferPoint, String filename, Request request) {
+
+    }
+
+    @Override
+    public void onTransferSuccess(TransferPoint transferPoint, File outputFile) {
+
+    }
+
+    @Override
+    public void onTransferFailed(TransferPoint transferPoint, String filename) {
 
     }
 }
