@@ -15,6 +15,8 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
@@ -64,11 +66,19 @@ public abstract class TransferPoint extends Thread implements Closeable {
     /** 和对端的连接的输出流 */
     DataOutputStream mOut;
 
+    /**  acceptMD5.equals(sendMD5) 判断接收文件和发送文件是否一致
+     *  文件完整:@return true
+     *  文件不完整:@return false*/
+    private boolean compare;
+
+
+
+
     /**
      * 创建新的连接端点
      * @param callback 事件回调
      */
-    public TransferPoint(String tag, Callback callback) {
+    public TransferPoint(String tag, Callback callback){
         super(tag + "-Thread");
         setPriority(Thread.MAX_PRIORITY);
         mTag = tag;
@@ -137,9 +147,12 @@ public abstract class TransferPoint extends Thread implements Closeable {
      * @param response 对端响应行
      */
     private void completeSendFile(File file, DataInputStream in, DataOutputStream out, String response) {
+
         boolean done = false;
         if (REPLY_OK.equals(response)) {
             try (FileInputStream fis = new FileInputStream(file)) {
+                // 创建 MD5 校验和 Send
+                MessageDigest mDigestSend = MessageDigest.getInstance("MD5");
                 byte[] buf = new byte[8192];
                 for (;;) {
                     int len = fis.read(buf);
@@ -161,7 +174,18 @@ public abstract class TransferPoint extends Thread implements Closeable {
                         System.err.println(mTag + ": Request interrupted by responding " + response);
                         return;
                     }
+                    // 计算校验
+                    mDigestSend.update(buf, 0, len);
                 }
+
+                // 计算最终的散列值
+                String sendMD5 = bytesToHex(mDigestSend.digest());
+
+                // 发送校验和
+                out.writeUTF(sendMD5);
+                out.flush();
+
+
                 response = in.readUTF();
                 System.err.println(mTag + ": Request completed with " + response);
                 done = REPLY_OK.equals(response);
@@ -171,7 +195,10 @@ public abstract class TransferPoint extends Thread implements Closeable {
             } catch (IOException e) {
                 System.err.println(mTag + ": Request failed with I/O error");
                 e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
             }
+
         } else {
             System.err.println(mTag + ": Request rejected by responding " + response);
         }
@@ -238,13 +265,17 @@ public abstract class TransferPoint extends Thread implements Closeable {
      * @param filename 文件名
      * @throws IOException 若发生 I/O 错误
      */
-    private void acceptFile(String filename) throws IOException {
+    private void acceptFile(String filename) throws IOException{
         mOut.writeUTF(REPLY_OK);
         mOut.flush();
+
+
         File outputFile = generateOutputFile(filename);
         byte[] buf = new byte[8192];
         boolean done = false;
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            // 创建 MessageDigest 对象 用于获取接收后的MD5
+            MessageDigest mDigestAccept = MessageDigest.getInstance("MD5");
             for (;;) {
                 // 读取本次传输的长度
                 int length = mIn.readInt();
@@ -259,15 +290,28 @@ public abstract class TransferPoint extends Thread implements Closeable {
                 }
                 mIn.readFully(buf, 0, length);
                 fos.write(buf, 0, length);
+
+                // 计算校验和
+                mDigestAccept.update(buf, 0, length);
+
                 mOut.writeUTF(REPLY_CONTINUE);
                 mOut.flush();
             }
+
+            // 计算接收文件的MD5
+            String acceptMD5 = bytesToHex(mDigestAccept.digest());
+            String sendMD5 = mIn.readUTF();
+
+            compare = CompareMD5.compare(acceptMD5, sendMD5);
+
         } catch (InterruptedIOException e) {
             System.err.println(mTag + ": Transfer aborted due to interruption");
             throw e;
         } catch (IOException e) {
             System.err.println(mTag + ": Transfer failed due to I/O error");
             throw e;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         } finally {
             System.out.println(mTag + ": Transfer completed");
             if (done) {
@@ -378,5 +422,30 @@ public abstract class TransferPoint extends Thread implements Closeable {
             System.out.println(mTag + ": End polling");
             mActionQueue.clear();
         }
+    }
+
+    /**
+     * 将字节数组转换为十六进制字符串。
+     *
+     * @param bytes 字节数组
+     * @return 十六进制字符串
+     */
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    /** 获取文件完整性
+     * @return 文件完整性
+     * */
+    public boolean getCompare() {
+        return compare;
     }
 }

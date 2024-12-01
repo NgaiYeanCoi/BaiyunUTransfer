@@ -5,12 +5,14 @@ import java.security.NoSuchAlgorithmException;
 
 
 public class MD5Example {
-    // 调用直接 MD5Example.getMD5("String"); 即可;
-    public static String getMD5(String input) {
+    // 调用直接 MD5Example.getMD5("byte[]"); 即可;
+    public static String getMD5(byte input) {
         try {
+            byte[] bytes = new byte[1];
+            bytes[0] = input;
             // 获取信息摘要对象
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(input.getBytes());
+            byte[] messageDigest = md.digest(bytes);
             StringBuffer stringBuffer = new StringBuffer(); // 创建一个动态的StringBuffer 用于储存MD5
             // 把每个 byte做一个与运算 & 0xff 再转换成十进制
             for (byte b : messageDigest) {
