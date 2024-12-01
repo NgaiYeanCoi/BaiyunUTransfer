@@ -7,6 +7,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
 
+/**
+ * @author NgaiYeanCoi
+ * */
+
 public class ReceiveRequestUI {
     static JFrame mainFrame = new JFrame("test");
 
@@ -24,6 +28,7 @@ public class ReceiveRequestUI {
         receiveFileRequestDialog.setSize(900, 600);
         receiveFileRequestDialog.setLocationRelativeTo(null); // 居中显示
         receiveFileRequestDialog.setResizable(false); // 禁止调整大小
+        receiveFileRequestDialog.isAlwaysOnTop();
         receiveFileRequestDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE); // 设置关闭操作
         receiveFileRequestDialog.setLayout(new BorderLayout()); // 设置布局
         receiveFileRequestDialog.setBackground(new Color(255, 255, 255));
