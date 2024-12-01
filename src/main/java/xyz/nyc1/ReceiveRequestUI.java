@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
 
+import static xyz.nyc1.SetBtnImage.setBtnImage;
+
 /**
  * @author NgaiYeanCoi
  * */
@@ -120,16 +122,5 @@ public class ReceiveRequestUI {
         // 显示对话框
         receiveFileRequestDialog.setVisible(true);
 
-    }
-
-    private static void setBtnImage(JButton Btn, Image BtnImage,int targetWidth, int targetHeight) {
-        //图片按钮样式
-        ImageIcon Icon = new ImageIcon(ImageReset.resizeImage(BtnImage, targetWidth, targetHeight));
-        ImageIcon receiveBtnRolloverIcon = ImageReset.createRolloverIcon(Icon,0.7f);
-        Btn.setIcon(Icon);
-        Btn.setBorderPainted(false);
-        Btn.setContentAreaFilled(false);
-        Btn.setFocusPainted(false);
-        Btn.setRolloverIcon(receiveBtnRolloverIcon);
     }
 }
