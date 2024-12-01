@@ -3,7 +3,7 @@ package xyz.nyc1;
 import javax.swing.*;
 import java.awt.*;
 /**
- * @author NgaiYeanCoi,canyie,Aasling
+ * @author NgaiYeanCoi
  * */
 
 public class ErrorDialog {
