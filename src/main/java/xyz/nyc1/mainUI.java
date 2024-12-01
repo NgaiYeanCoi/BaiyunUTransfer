@@ -228,6 +228,10 @@ public class mainUI {
                 {
                     new ErrorDialog(mainFrame, "端口不得小于1024");
                 }
+                else if(Integer.parseInt(port) > 65535)
+                {
+                    new ErrorDialog(mainFrame, "端口不得大于65535");
+                }
                 else {
                     // TODO:添加连接服务器的代码，需要连接后端API
                     sendLogTextArea.append("正在连接到 " + ip + ":" + port + "中...\n");
@@ -437,6 +441,10 @@ public class mainUI {
                 else if( Integer.parseInt(port) < 1024)
                 {
                     new ErrorDialog(mainFrame, "端口不得小于1024");
+                }
+                else if(Integer.parseInt(port) > 65535)
+                {
+                    new ErrorDialog(mainFrame, "端口不得大于65535");
                 }
                 else {
                     // TODO:添加连接服务器的代码，需要连接后端API
