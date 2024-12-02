@@ -16,7 +16,15 @@ public interface Callback {
     void onNewConnection(TransferPoint transferPoint, String address, Request request);
 
     /**
-     * 连接中断时触发，若此实例是服务端，此回调恒在收到新连接后才会触发；若为客户端，请求连接后先收到此回调而非新连接回调表示服务端拒绝连接
+     * 客户端尝试连接服务端失败时触发
+     * @param transferPoint 传输端点对象
+     * @param address 对方地址
+     * @param e 收到的异常
+     */
+    void onConnectionFailed(TransferPoint transferPoint, String address, Exception e);
+
+    /**
+     * 连接中断时触发，此回调恒在收到新连接后才会触发
      * @param transferPoint 传输端点对象
      * @param address 对方地址
      */
@@ -28,7 +36,7 @@ public interface Callback {
      * @param filename 文件名
      * @param request 请求对象 可以同意或拒绝请求
      */
-    void onReceiveFile(TransferPoint transferPoint, String filename, Request request);
+    void onReceiveFile(TransferPoint transferPoint, String filename, String address, Request request);
 
     /**
      * 传输文件成功时调用
