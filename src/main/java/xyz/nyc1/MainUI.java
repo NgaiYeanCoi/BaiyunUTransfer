@@ -827,7 +827,7 @@ public class MainUI extends WindowAdapter implements Callback {
     public void onReceiveFile(TransferPoint transferPoint, String filename, String address, Request request) {
         receiveRequestUI = new ReceiveRequestUI();
         try {
-            receiveRequestUI.show(filename, address, request);
+            receiveRequestUI.show(mainFrame,filename, address, request);
         } catch (UnsupportedLookAndFeelException e) {
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
@@ -862,7 +862,7 @@ public class MainUI extends WindowAdapter implements Callback {
             sendLogTextArea.append(msg);
         }
         if (receiveRequestUI != null) {
-            receiveRequestUI.onTransferFailed();
+            receiveRequestUI.onTransferFailed(mainFrame);
             receiveRequestUI = null;
         }
     }

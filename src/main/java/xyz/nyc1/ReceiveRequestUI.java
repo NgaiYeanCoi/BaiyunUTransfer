@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 
 import static xyz.nyc1.SetBtnImage.setBtnImage;
@@ -17,16 +18,18 @@ import xyz.nyc1.backend.Request;
  * */
 
 public class ReceiveRequestUI {
-    private JFrame mainFrame;
     private JDialog receiveFileRequestDialog;
+    private JButton progressBtn;
+    private JProgressBar progressBar;
+    private JDialog progressDialog;
 
-    public void show(String filename, String address, Request request) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-        mainFrame = new JFrame("接收请求");
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭操作
-        mainFrame.setSize(500, 400);
-        mainFrame.setResizable(false); // 禁止窗口调整大小
-        mainFrame.setLocationRelativeTo(null);
-        mainFrame.getContentPane().setBackground(new Color(255, 255, 255)); // 设置窗口的背景颜色为白色
+    public void show(JFrame mainFrame,String filename, String address, Request request) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        //mainFrame = new JFrame("接收请求");
+        //mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭操作
+        //mainFrame.setSize(500, 400);
+        //mainFrame.setResizable(false); // 禁止窗口调整大小
+        //mainFrame.setLocationRelativeTo(null);
+        //mainFrame.getContentPane().setBackground(new Color(255, 255, 255)); // 设置窗口的背景颜色为白色
 
         String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         UIManager.setLookAndFeel(lookAndFeel);
@@ -133,7 +136,7 @@ public class ReceiveRequestUI {
 
     }
     private void creatProgressBar(Component parentComponent){
-        JDialog progressDialog = new JDialog((Frame) parentComponent, "接收文件", true); // 设置为模态
+        progressDialog = new JDialog((Frame) parentComponent, "接收文件", true); // 设置为模态
         progressDialog.setSize(300, 100);
         progressDialog.setLocationRelativeTo(null); // 居中显示
         progressDialog.setResizable(false); // 禁止调整大小
@@ -141,19 +144,19 @@ public class ReceiveRequestUI {
         progressDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
-        JProgressBar progressBar = new JProgressBar();// 创建进度条对象
+        progressBar = new JProgressBar();// 创建进度条对象
         progressBar.setStringPainted(true);// 设置显示提示信息
         progressBar.setIndeterminate(true);// 设置采用不确定进度条
         progressBar.setString("正在传输中...");// 设置提示信息
-        JButton cancelBtn = new JButton("取消");
+        progressBtn = new JButton("取消");
 
         //TODO:当文件传输完之后需要接回调弹出窗口表示传输成功然后关闭该界面所有窗口
 
         // 将进度条和取消按钮添加到面板
         panel.add(progressBar, BorderLayout.CENTER);
-        panel.add(cancelBtn, BorderLayout.SOUTH);
+        panel.add(progressBtn, BorderLayout.SOUTH);
         // 设置取消按钮的点击事件
-        cancelBtn.addActionListener(new ActionListener() {
+        progressBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int result = JOptionPane.showConfirmDialog(progressDialog,"你确定要取消接收吗？","提示",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
@@ -176,10 +179,39 @@ public class ReceiveRequestUI {
 
     public void onTransferSuccess(File outputFile) {
         // TODO Implement
+        progressBtn.setText("确定");
+        progressBar.setString("完成");
+        // 移除现有的监听器
+        ActionListener[] listeners = progressBtn.getActionListeners();
+        for (ActionListener listener : listeners) {
+            progressBtn.removeActionListener(listener);
+        }
+        // 监听新的事件
+        progressBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Desktop desktop = Desktop.getDesktop();
+                    if (desktop.isSupported(Desktop.Action.OPEN)) {
+                        desktop.open(outputFile.getParentFile());
+                        progressDialog.dispose();
+                        receiveFileRequestDialog.dispose();
+                    } else {
+                        System.out.println("打开文件夹的功能不被支持");
+                    }
+                } catch (IOException m) {
+                    throw new RuntimeException(m);
+                }
+            }
+        });
+
     }
 
-    public void onTransferFailed() {
+        public void onTransferFailed(JFrame mainFrame) {
         // TODO Implement
+            new ErrorDialog(mainFrame,"文件传输失败！");
+            progressDialog.dispose();
+            receiveFileRequestDialog.dispose();
     }
 
 }
