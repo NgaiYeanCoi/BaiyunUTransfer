@@ -22,6 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * 抽象的连接端点类，可以是服务端也可以是客户端
@@ -70,11 +71,21 @@ public abstract class TransferPoint extends Thread implements Closeable {
      * 创建新的连接端点
      * @param callback 事件回调
      */
-    public TransferPoint(String tag, Callback callback){
+    public TransferPoint(String tag, String downloadDir, Callback callback) {
         super(tag + "-Thread");
         setPriority(Thread.MAX_PRIORITY);
         mTag = tag;
         mCallback = callback;
+
+        if (downloadDir == null) {
+            File defaultDownloadDir = new File(FileSystemView.getFileSystemView().getHomeDirectory(), "云移");
+            defaultDownloadDir.mkdirs();
+            setDownloadDir(defaultDownloadDir);
+        } else {
+            setDownloadDir(new File(downloadDir));
+        }
+
+        System.out.println(mTag + ": Create with " + mBaseDownloadPath);
     }
 
     /**

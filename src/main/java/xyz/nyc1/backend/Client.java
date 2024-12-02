@@ -24,8 +24,8 @@ public class Client extends TransferPoint {
      * @throws java.net.UnknownHostException 目标主机找不到时抛出
      * @throws IOException 发生 I/O 错误时抛出
      */
-    public Client(String address, int port, Callback callback) throws IOException {
-        super("Client", callback);
+    public Client(String address, int port, String downloadDir, Callback callback) throws IOException {
+        super("Client", downloadDir, callback);
         mSocket = new Socket(address, port);
     }
 

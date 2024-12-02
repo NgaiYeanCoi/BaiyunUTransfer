@@ -25,8 +25,8 @@ public class Server extends TransferPoint {
      * @param callback 当服务器收到新事件时，调用的回调函数
      * @throws IOException 发生 I/O 错误如对应端口被占用时触发
      */
-    public Server(int port, Callback callback) throws IOException {
-        super("Server", callback);
+    public Server(int port, String downloadDir, Callback callback) throws IOException {
+        super("Server", downloadDir, callback);
         mServerSocket = new ServerSocket(port);
     }
 
