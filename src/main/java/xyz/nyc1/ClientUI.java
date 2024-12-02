@@ -392,12 +392,17 @@ public class ClientUI implements Callback {
     }
 
     @Override
+    public void onConnectionFailed(TransferPoint transferPoint, String address, Exception e) {
+
+    }
+
+    @Override
     public void onLostConnection(TransferPoint transferPoint, String address) {
 
     }
 
     @Override
-    public void onReceiveFile(TransferPoint transferPoint, String filename, Request request) {
+    public void onReceiveFile(TransferPoint transferPoint, String filename, String address, Request request) {
 
 
 

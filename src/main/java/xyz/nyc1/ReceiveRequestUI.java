@@ -9,6 +9,8 @@ import java.util.Objects;
 
 import static xyz.nyc1.SetBtnImage.setBtnImage;
 
+import xyz.nyc1.backend.Request;
+
 /**
  * @author NgaiYeanCoi
  * */
@@ -17,8 +19,7 @@ public class ReceiveRequestUI {
     static JFrame mainFrame = new JFrame("test");
 
 
-    public static void DemoTest() {
-
+    public static void show(String filename, String address, Request request) {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭操作
         mainFrame.setSize(500, 400);
         mainFrame.setResizable(false); // 禁止窗口调整大小
@@ -59,14 +60,13 @@ public class ReceiveRequestUI {
         JLabel receiveIpInfoLabel = new JLabel();
         receiveIpInfoLabel.setFont(new Font("Microsoft YaHei UI", Font.BOLD, 25));
         //TODO:需接后端API获取到远端的IP地址
-        String ipAddressInfo = "127.0.0.1";
-        receiveIpInfoLabel.setText(ipAddressInfo);
+        receiveIpInfoLabel.setText(address);
         receiveIpInfoLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // 使标签居中
         centerPanel.add(receiveIpInfoLabel);
         centerPanel.add(Box.createVerticalStrut(30)); //设置垂直间距
 
         // 添加消息标签
-        JLabel receiveMessageInfoLabel = new JLabel("想要发送给你一个文件");
+        JLabel receiveMessageInfoLabel = new JLabel("想要发送给你一个文件 " + filename);
         receiveMessageInfoLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 30));
         receiveMessageInfoLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // 使标签居中
         centerPanel.add(receiveMessageInfoLabel);
@@ -98,35 +98,25 @@ public class ReceiveRequestUI {
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
         receiveFileRequestDialog.add(mainPanel);
 
-
-
-        receiveAcceptBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO:接收文件同意，需接后端API
-                System.out.println("accept");
-                creatProgressBar(receiveFileRequestDialog);
-                //receiveFileRequestDialog.dispose();
-
-            }
+        receiveAcceptBtn.addActionListener(e -> {
+            System.out.println("accept");
+            request.accept();
+            creatProgressBar(receiveFileRequestDialog);
+            //receiveFileRequestDialog.dispose();
         });
-        receiveRejectBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO:接收文件拒绝，需接后端API
-                System.out.println("decline");
-                int result = JOptionPane.showConfirmDialog(receiveFileRequestDialog,"你确定要取消接收吗？","提示",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
-                if (result == JOptionPane.YES_OPTION){
-                    System.out.println("yes");
-                    receiveFileRequestDialog.dispose();
-                }
-                else if(result == JOptionPane.NO_OPTION||result == JOptionPane.CLOSED_OPTION){
-                    System.out.println("cancel");
-
-                }
-                //receiveFileRequestDialog.dispose();
+        receiveRejectBtn.addActionListener(e -> {
+            System.out.println("decline");
+            int result = JOptionPane.showConfirmDialog(receiveFileRequestDialog,"你确定要取消接收吗？","提示",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+            if (result == JOptionPane.YES_OPTION){
+                System.out.println("yes");
+                request.decline();
+                receiveFileRequestDialog.dispose();
+            }
+            else if(result == JOptionPane.NO_OPTION||result == JOptionPane.CLOSED_OPTION){
+                System.out.println("cancel");
 
             }
+            //receiveFileRequestDialog.dispose();
         });
 
 

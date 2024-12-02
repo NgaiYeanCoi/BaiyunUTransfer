@@ -1,7 +1,9 @@
 package xyz.nyc1;
 
 import xyz.nyc1.backend.Callback;
+import xyz.nyc1.backend.Client;
 import xyz.nyc1.backend.Request;
+import xyz.nyc1.backend.Server;
 import xyz.nyc1.backend.TransferPoint;
 
 import javax.swing.*;
@@ -18,9 +20,13 @@ import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.awt.Desktop;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,7 +36,10 @@ import static xyz.nyc1.NetworkIpInterface.getHostIPs;
  * @author NgaiYeanCoi
  * */
 
-public class MainUI implements Callback {
+public class MainUI extends WindowAdapter implements Callback {
+    private TransferPoint transferPoint;
+    private String selectedDownloadDir;
+
     /**
      * 主要的UI界面
      */
@@ -70,6 +79,7 @@ public class MainUI implements Callback {
     private JPanel settingTopPanel;
     /*默认面板*/
     private JPanel defaultPanel;
+    private JButton leftReceiveBtn;
 
     public MainUI() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         createUI();
@@ -82,9 +92,9 @@ public class MainUI implements Callback {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setResizable(false);
+        mainFrame.addWindowListener(this);
         ImageIcon icon32 = new ImageIcon(Objects.requireNonNull(MainUI.class.getResource("/images/icon32x32.png")));
         mainFrame.setIconImage(icon32.getImage());
-
         // 创建主面板
         mainPanel = new JPanel(new BorderLayout());
 
@@ -116,7 +126,7 @@ public class MainUI implements Callback {
         leftPanel.add(leftSendBtn);
         leftPanel.add(Box.createVerticalStrut(45));
 
-        JButton leftReceiveBtn = new JButton("接收");
+        leftReceiveBtn = new JButton("接收");
         leftReceiveBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         leftPanel.add(leftReceiveBtn);
         leftPanel.add(Box.createVerticalStrut(45));
@@ -239,56 +249,43 @@ public class MainUI implements Callback {
         rightSendPanel.add(bottomPanel,BorderLayout.SOUTH);//添加底部面板到右侧面板
 
         // 添加连接按钮事件监听器
-        connectBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String ip = ipSegment1.getText() + "." + ipSegment2.getText() + "." + ipSegment3.getText() + "." + ipSegment4.getText();
-                String port = sendPortTextField.getText();
-                // 判断ip以及port的合法性
-                if((ipSegment1.getText().isEmpty()) || ipSegment2.getText().isEmpty()||ipSegment3.getText().isEmpty()||ipSegment4.getText().isEmpty()) {
-                    new ErrorDialog(mainFrame, "IP地址不能为空！");
-                }
-                else if(port.isEmpty()){
-                    new ErrorDialog(mainFrame, "端口不能为空");
-                }
-                else if( Integer.parseInt(port) < 1024)
-                {
-                    new ErrorDialog(mainFrame, "端口不得小于1024");
-                }
-                else if(Integer.parseInt(port) > 65535)
-                {
-                    new ErrorDialog(mainFrame, "端口不得大于65535");
-                }
-                else {
-                    // TODO:添加连接服务器的代码，需要连接后端API
-                    leftReceiveBtn.setEnabled(false);
-                    sendLogTextArea.append("正在连接到 " + ip + ":" + port + "中...\n");
-                    sendLogTextArea.append("已成功连接！\n");
-                    connectBtn.setVisible(false);
-                    selectFileBtn.setVisible(true);
-                    disconnectBtn.setVisible(true);
-
-
-                }
-
+        connectBtn.addActionListener(e -> {
+            String ip = ipSegment1.getText() + "." + ipSegment2.getText() + "." + ipSegment3.getText() + "." + ipSegment4.getText();
+            String port = sendPortTextField.getText();
+            // 判断ip以及port的合法性
+            if((ipSegment1.getText().isEmpty()) || ipSegment2.getText().isEmpty()||ipSegment3.getText().isEmpty()||ipSegment4.getText().isEmpty()) {
+                new ErrorDialog(mainFrame, "IP地址不能为空！");
+            } else if(port.isEmpty()){
+                new ErrorDialog(mainFrame, "端口不能为空");
+            } else if( Integer.parseInt(port) < 1024) {
+                new ErrorDialog(mainFrame, "端口不得小于1024");
+            } else if(Integer.parseInt(port) > 65535) {
+                new ErrorDialog(mainFrame, "端口不得大于65535");
+            } else {
+                sendLogTextArea.append("正在连接到 " + ip + ":" + port + "中...\n");
+                transferPoint = new Client(ip, Integer.parseInt(port), selectedDownloadDir, this);
+                transferPoint.start();
+                leftReceiveBtn.setEnabled(false);
+                connectBtn.setEnabled(false);
             }
         });
 
-        disconnectBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String ip = ipSegment1.getText() + "." + ipSegment2.getText() + "." + ipSegment3.getText();
-                String port = sendPortTextField.getText();
-                // TODO:断开连接，需要后端api
-                sendLogTextArea.append(ip + ":" + port + " 已断开连接\n");
-                disconnectBtn.setVisible(false);
-                selectFileBtn.setVisible(false);
-                sendFileBtn.setVisible(false);
-                connectBtn.setVisible(true);
-                cancelSelectedBtn.setVisible(false);
-                leftReceiveBtn.setEnabled(true);
-                globalFilePath = null;
+        disconnectBtn.addActionListener(e -> {
+            String ip = ipSegment1.getText() + "." + ipSegment2.getText() + "." + ipSegment3.getText();
+            String port = sendPortTextField.getText();
+            if (transferPoint != null) {
+                sendLogTextArea.append("正在断开 " + ip + ":" + port + "\n");
+                transferPoint.close();
+                transferPoint = null;
             }
+            disconnectBtn.setVisible(false);
+            selectFileBtn.setVisible(false);
+            sendFileBtn.setVisible(false);
+            connectBtn.setEnabled(true);
+            connectBtn.setVisible(true);
+            cancelSelectedBtn.setVisible(false);
+            leftReceiveBtn.setEnabled(true);
+            globalFilePath = null;
         });
 
         selectFileBtn.addActionListener(new ActionListener() {
@@ -342,11 +339,9 @@ public class MainUI implements Callback {
                                     cancelSelectedBtn.setVisible(true);
                                     sendFileBtn.setVisible(true);
 
-                                }
-                                else{
+                                } else {
                                     new ErrorDialog(selectFileDialog, "一次只能发送一个文件,请重新操作！");
                                     evt.rejectDrop();
-
                                 }
                             }
                         } catch (Exception e) {
@@ -356,21 +351,18 @@ public class MainUI implements Callback {
                 });
 
                 // 内部视窗文件选择按钮呼出文件浏览器
-                innerSelectBtn.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        JFileChooser fileChooser = new JFileChooser();
-                        int result = fileChooser.showOpenDialog(selectFileDialog);
-                        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                        if (result == JFileChooser.APPROVE_OPTION) {
-                            globalFilePath = fileChooser.getSelectedFile().getAbsolutePath();
-                            sendLogTextArea.append("已选择文件: " + globalFilePath + "\n");
-                            if (!globalFilePath.isEmpty()) {
-                                selectFileDialog.dispose();
-                                selectFileBtn.setVisible(false);
-                                cancelSelectedBtn.setVisible(true);
-                                sendFileBtn.setVisible(true);
-                            }
+                innerSelectBtn.addActionListener(e1 -> {
+                    JFileChooser fileChooser = new JFileChooser();
+                    int result = fileChooser.showOpenDialog(selectFileDialog);
+                    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        globalFilePath = fileChooser.getSelectedFile().getAbsolutePath();
+                        sendLogTextArea.append("已选择文件: " + globalFilePath + "\n");
+                        if (!globalFilePath.isEmpty()) {
+                            selectFileDialog.dispose();
+                            selectFileBtn.setVisible(false);
+                            cancelSelectedBtn.setVisible(true);
+                            sendFileBtn.setVisible(true);
                         }
                     }
                 });
@@ -385,9 +377,8 @@ public class MainUI implements Callback {
              * */
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO:发送文件，需要后端api
+                transferPoint.sendFile(globalFilePath);
                 sendLogTextArea.append("发送文件中...\n");
-                sendLogTextArea.append("发送成功！\n");
                 selectFileBtn.setVisible(true);
                 sendFileBtn.setVisible(false);
                 cancelSelectedBtn.setVisible(false);
@@ -465,42 +456,41 @@ public class MainUI implements Callback {
         rightReceivePanel.add(receiveCenterScrollPane);
 
         // 添加监听按钮事件监听器
-        receiveListenBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String port = receivePortTextField.getText();
-                // 判断port的合法性
-                if(port.isEmpty()) {
-                    new ErrorDialog(mainFrame, "端口不能为空");
+        receiveListenBtn.addActionListener(e -> {
+            String port = receivePortTextField.getText();
+            // 判断port的合法性
+            if(port.isEmpty()) {
+                new ErrorDialog(mainFrame, "端口不能为空");
+            } else if(Integer.parseInt(port) < 1024) {
+                new ErrorDialog(mainFrame, "端口不得小于1024");
+            } else if(Integer.parseInt(port) > 65535) {
+                new ErrorDialog(mainFrame, "端口不得大于65535");
+            } else {
+                receiveLogTextArea.append("正在监听本机"+receivePortTextField.getText()+"端口中...\n");
+                try {
+                    transferPoint = new Server(Integer.parseInt(port), selectedDownloadDir, this);
+                    transferPoint.start();
+                } catch (IOException ex) {
+                    receiveLogTextArea.append("启动服务器失败，此端口可能已被占用，请选择其他端口号！" + ex + "\n");
+                    return;
                 }
-                else if( Integer.parseInt(port) < 1024)
-                {
-                    new ErrorDialog(mainFrame, "端口不得小于1024");
-                }
-                else if(Integer.parseInt(port) > 65535)
-                {
-                    new ErrorDialog(mainFrame, "端口不得大于65535");
-                }
-                else {
-                    // TODO:添加连接服务器的代码，需要连接后端API
-                    receiveLogTextArea.append("正在监听本机"+receivePortTextField.getText()+"端口中...\n");
-                    receiveListenBtn.setVisible(false);
-                    receivePauseListenBtn.setVisible(true);
-                    leftSendBtn.setEnabled(false);
-                }
+                receiveListenBtn.setVisible(false);
+                receivePauseListenBtn.setVisible(true);
+                leftSendBtn.setEnabled(false);
             }
         });
 
         // 添加停止监听按钮事件监听器
-        receivePauseListenBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO:需连接后端API断开
-                receiveLogTextArea.append("已停止监听\n");
-                receivePauseListenBtn.setVisible(false);
-                receiveListenBtn.setVisible(true);
-                leftSendBtn.setEnabled(true);
+        receivePauseListenBtn.addActionListener(e -> {
+            //TODO:需连接后端API断开
+            if (transferPoint != null) {
+                transferPoint.close();
+                transferPoint = null;
             }
+            receiveLogTextArea.append("已停止监听\n");
+            receivePauseListenBtn.setVisible(false);
+            receiveListenBtn.setVisible(true);
+            leftSendBtn.setEnabled(true);
         });
 
 
@@ -546,13 +536,10 @@ public class MainUI implements Callback {
         addSettingLabel("清空所有日志");
         JButton settingClearLogBtn = new JButton("清空");
         addSettingBtn(settingClearLogBtn);
-        settingClearLogBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        settingClearLogBtn.addActionListener(e -> {
             receiveLogTextArea.setText("");
             sendLogTextArea.setText("");
             new InfoDialog(mainFrame,"清空成功！");
-            }
         });
 
         //设置保存路径板块
@@ -565,20 +552,16 @@ public class MainUI implements Callback {
         settingGbc.weightx = 1.0; // 让标签占据更多空间
         settingCenterPanel.add(settingDefaultPathLabel, settingGbc);
         settingGbc.gridy++;  // 移动到下一行
-        settingDefaultPathBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int result = fileChooser.showOpenDialog(mainFrame);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    String selectedPath = fileChooser.getSelectedFile().getAbsolutePath();
-                    //TODO：需接后端API
-                    settingDefaultPathLabel.setText("当前路径为："+selectedPath);
-                    new InfoDialog(mainFrame,"设置默认路径成功！");
-
-                }
-
+        settingDefaultPathBtn.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int result = fileChooser.showOpenDialog(mainFrame);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                selectedDownloadDir = fileChooser.getSelectedFile().getAbsolutePath();
+                if (transferPoint != null)
+                    transferPoint.setDownloadDir(new File(selectedDownloadDir));
+                settingDefaultPathLabel.setText("当前路径为："+selectedDownloadDir);
+                new InfoDialog(mainFrame,"设置默认路径成功！");
             }
         });
 
@@ -596,25 +579,20 @@ public class MainUI implements Callback {
         settingGbc.weightx = 0.0; // 按钮不需要额外空间
         settingCenterPanel.add(selectStyleBox, settingGbc);
         settingGbc.gridy++;  // 移动到下一行
-        selectStyleBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String  selectedItem=(String)selectStyleBox.getSelectedItem();
-                if("默认".equals(selectedItem)) {
-                    mainColor = "#e6eef2";
-                    viceColor = "#f0f7fa";
-                    changeStyle(mainColor,viceColor);
-                }
-                else if("亮白".equals(selectedItem)) {
-                    mainColor = "#ffffff";
-                    viceColor = "#f8f9fa";
-                    changeStyle(mainColor,viceColor);
-                }
-                else if ("樱花粉".equals(selectedItem)) {
-                    mainColor = "#f2e1ed";
-                    viceColor = "#faf2f7";
-                    changeStyle(mainColor,viceColor);
-                }
+        selectStyleBox.addActionListener(e -> {
+            String  selectedItem=(String)selectStyleBox.getSelectedItem();
+            if("默认".equals(selectedItem)) {
+                mainColor = "#e6eef2";
+                viceColor = "#f0f7fa";
+                changeStyle(mainColor,viceColor);
+            } else if("亮白".equals(selectedItem)) {
+                mainColor = "#ffffff";
+                viceColor = "#f8f9fa";
+                changeStyle(mainColor,viceColor);
+            } else if ("樱花粉".equals(selectedItem)) {
+                mainColor = "#f2e1ed";
+                viceColor = "#faf2f7";
+                changeStyle(mainColor,viceColor);
             }
         });
 
@@ -622,16 +600,13 @@ public class MainUI implements Callback {
         addSettingLabel("Source Code (Github)");
         JButton settingGithubBtn = new JButton("打开");
         addSettingBtn(settingGithubBtn);
-        settingGithubBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    // 打开 GitHub 主页
-                    Desktop.getDesktop().browse(new URI("https://github.com/NgaiYeanCoi/BaiyunUTransfer"));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    new ErrorDialog(mainFrame,ex.getMessage());
-                }
+        settingGithubBtn.addActionListener(e -> {
+            try {
+                // 打开 GitHub 主页
+                Desktop.getDesktop().browse(new URI("https://github.com/NgaiYeanCoi/BaiyunUTransfer"));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                new ErrorDialog(mainFrame,ex.getMessage());
             }
         });
 
@@ -645,28 +620,19 @@ public class MainUI implements Callback {
         mainFrame.add(mainPanel);
 
         // 添加按钮监听事件
-        leftSendBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cardLayout.show(centerPanel, "send");
-                currentCard = "send";
-            }
+        leftSendBtn.addActionListener(e -> {
+            cardLayout.show(centerPanel, "send");
+            currentCard = "send";
         });
 
-        leftReceiveBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cardLayout.show(centerPanel, "receive");
-                currentCard = "receive";
-            }
+        leftReceiveBtn.addActionListener(e -> {
+            cardLayout.show(centerPanel, "receive");
+            currentCard = "receive";
         });
 
-        leftSettingBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cardLayout.show(centerPanel, "setting");
-                currentCard = "setting";
-            }
+        leftSettingBtn.addActionListener(e -> {
+            cardLayout.show(centerPanel, "setting");
+            currentCard = "setting";
         });
 
         mainFrame.setVisible(true);
@@ -795,26 +761,76 @@ public class MainUI implements Callback {
 
     @Override
     public void onNewConnection(TransferPoint transferPoint, String address, Request request) {
+        if (request != null) request.accept();
+        String msg = "已成功连接到 " + address + "\n";
+        if (transferPoint instanceof Server) {
+            receiveLogTextArea.append(msg);
+        } else {
+            sendLogTextArea.append(msg);
+            connectBtn.setVisible(false);
+            disconnectBtn.setVisible(true);
+        }
+        selectFileBtn.setVisible(true);
+    }
 
+    @Override
+    public void onConnectionFailed(TransferPoint transferPoint, String address, Exception e) {
+        if (e instanceof UnknownHostException) {
+            sendLogTextArea.append("欲连接主机不存在或您未连接到目标网络！\n");
+        } else {
+            sendLogTextArea.append("连接失败，请检查网络、目标主机地址及端口号！\n" + e + "\n");
+        }
+        leftReceiveBtn.setEnabled(true);
+        connectBtn.setEnabled(true);
     }
 
     @Override
     public void onLostConnection(TransferPoint transferPoint, String address) {
-
+        String msg = address + " 已断开连接\n";
+        if (transferPoint instanceof Server) {
+            receiveLogTextArea.append(msg);
+        } else {
+            sendLogTextArea.append(msg);
+            disconnectBtn.setVisible(false);
+            selectFileBtn.setVisible(false);
+            sendFileBtn.setVisible(false);
+            connectBtn.setEnabled(true);
+            connectBtn.setVisible(true);
+            cancelSelectedBtn.setVisible(false);
+            leftReceiveBtn.setEnabled(true);
+            globalFilePath = null;
+        }
     }
 
     @Override
-    public void onReceiveFile(TransferPoint transferPoint, String filename, Request request) {
-
+    public void onReceiveFile(TransferPoint transferPoint, String filename, String address, Request request) {
+        ReceiveRequestUI.show(filename, address, request);
     }
 
     @Override
     public void onTransferSuccess(TransferPoint transferPoint, File outputFile) {
-
+        String msg = outputFile == null ? "发送文件成功" : "接收文件成功，放置在 " + outputFile + "\n";
+        if (transferPoint instanceof Server) {
+            receiveLogTextArea.append(msg);
+        } else {
+            sendLogTextArea.append(msg);
+        }
     }
 
     @Override
     public void onTransferFailed(TransferPoint transferPoint, String filename) {
+        String msg = "传输文件 " + filename + " 失败！\n";
+        if (transferPoint instanceof Server) {
+            receiveLogTextArea.append(msg);
+        } else {
+            sendLogTextArea.append(msg);
+        }
+    }
 
+    @Override public void windowClosing(WindowEvent e) {
+        if (transferPoint != null) {
+            transferPoint.close();
+            transferPoint = null;
+        }
     }
 }
