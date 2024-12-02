@@ -334,6 +334,7 @@ public class MainUI extends WindowAdapter implements Callback {
                                 if(files.size()==1){
                                     File file = files.get(0);
                                     globalFilePath = file.getAbsolutePath();
+                                    receiveLogTextArea.append("已选择文件 " + globalFilePath + "\n");
                                     sendLogTextArea.append("已选择文件 " + globalFilePath + "\n");
                                     selectFileDialog.dispose();
                                     selectFileBtn.setVisible(false);
@@ -359,6 +360,7 @@ public class MainUI extends WindowAdapter implements Callback {
                     if (result == JFileChooser.APPROVE_OPTION) {
                         globalFilePath = fileChooser.getSelectedFile().getAbsolutePath();
                         sendLogTextArea.append("已选择文件: " + globalFilePath + "\n");
+                        receiveLogTextArea.append("已选择文件 " + globalFilePath + "\n");
                         if (!globalFilePath.isEmpty()) {
                             selectFileDialog.dispose();
                             selectFileBtn.setVisible(false);
@@ -380,6 +382,7 @@ public class MainUI extends WindowAdapter implements Callback {
             public void actionPerformed(ActionEvent e) {
                 transferPoint.sendFile(globalFilePath);
                 sendLogTextArea.append("发送文件中...\n");
+                receiveLogTextArea.append("发送文件中...\n");
                 selectFileBtn.setVisible(true);
                 sendFileBtn.setVisible(false);
                 cancelSelectedBtn.setVisible(false);
@@ -393,6 +396,7 @@ public class MainUI extends WindowAdapter implements Callback {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendLogTextArea.append("已取消选取文件" + globalFilePath + "\n");
+                receiveLogTextArea.append("已取消选取文件" + globalFilePath + "\n");
                 globalFilePath = null;
                 selectFileBtn.setVisible(true);
                 sendFileBtn.setVisible(false);
@@ -454,7 +458,8 @@ public class MainUI extends WindowAdapter implements Callback {
         JScrollPane receiveCenterScrollPane = new JScrollPane(receiveLogTextArea);
         receiveCenterScrollPane.setPreferredSize(new Dimension(0, 500)); // 设置滚动面板的首选大小
         receiveCenterScrollPane.setBorder(null);
-        rightReceivePanel.add(receiveCenterScrollPane);
+        rightReceivePanel.add(receiveCenterScrollPane,BorderLayout.CENTER);
+        rightReceivePanel.add(bottomPanel,BorderLayout.SOUTH);//添加底部面板到右侧面板
 
         // 添加监听按钮事件监听器
         receiveListenBtn.addActionListener(e -> {
@@ -471,6 +476,7 @@ public class MainUI extends WindowAdapter implements Callback {
                 try {
                     transferPoint = new Server(Integer.parseInt(port), selectedDownloadDir, this);
                     transferPoint.start();
+                    selectFileBtn.setVisible(true);
                 } catch (IOException ex) {
                     receiveLogTextArea.append("启动服务器失败，此端口可能已被占用，请选择其他端口号！" + ex + "\n");
                     return;
