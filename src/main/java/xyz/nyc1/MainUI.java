@@ -38,6 +38,7 @@ import static xyz.nyc1.NetworkIpInterface.getHostIPs;
 
 public class MainUI extends WindowAdapter implements Callback {
     private TransferPoint transferPoint;
+    private ReceiveRequestUI receiveRequestUI;
     private String selectedDownloadDir;
 
     /**
@@ -804,16 +805,31 @@ public class MainUI extends WindowAdapter implements Callback {
 
     @Override
     public void onReceiveFile(TransferPoint transferPoint, String filename, String address, Request request) {
-        //ReceiveRequestUI.show(filename, address, request);
+        receiveRequestUI = new ReceiveRequestUI();
+        try {
+            receiveRequestUI.show(filename, address, request);
+        } catch (UnsupportedLookAndFeelException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void onTransferSuccess(TransferPoint transferPoint, File outputFile) {
-        String msg = outputFile == null ? "发送文件成功" : "接收文件成功，放置在 " + outputFile + "\n";
+        String msg = outputFile == null ? "发送文件成功\n" : "接收文件成功，放置在 " + outputFile + "\n";
         if (transferPoint instanceof Server) {
             receiveLogTextArea.append(msg);
         } else {
             sendLogTextArea.append(msg);
+        }
+        if (receiveRequestUI != null) {
+            receiveRequestUI.onTransferSuccess(outputFile);
+            receiveRequestUI = null;
         }
     }
 
@@ -824,6 +840,10 @@ public class MainUI extends WindowAdapter implements Callback {
             receiveLogTextArea.append(msg);
         } else {
             sendLogTextArea.append(msg);
+        }
+        if (receiveRequestUI != null) {
+            receiveRequestUI.onTransferFailed();
+            receiveRequestUI = null;
         }
     }
 

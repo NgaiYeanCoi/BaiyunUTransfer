@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Objects;
 
 import static xyz.nyc1.SetBtnImage.setBtnImage;
@@ -19,11 +20,7 @@ public class ReceiveRequestUI {
     private JFrame mainFrame;
     private JDialog receiveFileRequestDialog;
 
-    public ReceiveRequestUI() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-        show("D:/test","127.0.0.1");
-    }
-
-    public void show(String filename, String address) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public void show(String filename, String address, Request request) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         mainFrame = new JFrame("接收请求");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭操作
         mainFrame.setSize(500, 400);
@@ -108,16 +105,16 @@ public class ReceiveRequestUI {
 
         receiveAcceptBtn.addActionListener(e -> {
             System.out.println("accept");
-            //request.accept();
+            request.accept();
             creatProgressBar(mainFrame);
-            //receiveFileRequestDialog.dispose();
+            receiveFileRequestDialog.dispose();
         });
         receiveRejectBtn.addActionListener(e -> {
             System.out.println("decline");
             int result = JOptionPane.showConfirmDialog(receiveFileRequestDialog,"你确定要取消接收吗？","提示",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
             if (result == JOptionPane.YES_OPTION){
                 System.out.println("yes");
-                //request.decline();
+                request.decline();
                 receiveFileRequestDialog.dispose();
             }
             else if(result == JOptionPane.NO_OPTION||result == JOptionPane.CLOSED_OPTION){
@@ -175,6 +172,14 @@ public class ReceiveRequestUI {
         // 将面板添加到对话框
         progressDialog.add(panel);
         progressDialog.setVisible(true);
+    }
+
+    public void onTransferSuccess(File outputFile) {
+        // TODO Implement
+    }
+
+    public void onTransferFailed() {
+        // TODO Implement
     }
 
 }
