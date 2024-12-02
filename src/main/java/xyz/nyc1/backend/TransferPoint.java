@@ -221,7 +221,8 @@ public abstract class TransferPoint extends Thread implements Closeable {
                         mOut.flush();
                     } else {
                         Request req = new Request();
-                        SwingUtilities.invokeLater(() -> mCallback.onReceiveFile(TransferPoint.this, filename, req));
+                        SwingUtilities.invokeLater(() -> mCallback.onReceiveFile(
+                                TransferPoint.this, filename, mSocket.getInetAddress().getHostAddress(), req));
                         if (req.await()) {
                             System.out.println(mTag + ": Accepted file transfer request");
                             acceptFile(filename);
@@ -374,8 +375,18 @@ public abstract class TransferPoint extends Thread implements Closeable {
      * 关闭此端点并等待所有操作完成
      */
     @Override public void close() {
+        System.out.println(mTag + ": Close");
         interrupt();
         stopPolling();
+        Socket socket = mSocket;
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                System.err.println(mTag + ": Failed to close socket");
+                e.printStackTrace();
+            }
+        }
         try {
             join();
         } catch (InterruptedException e) {

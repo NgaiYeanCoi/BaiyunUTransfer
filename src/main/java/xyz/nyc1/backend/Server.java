@@ -36,16 +36,23 @@ public class Server extends TransferPoint {
     @Override public void run() {
         try (mServerSocket) {
             for (;;) {
+                System.out.println("Server: Waiting for connection");
                 mSocket = mServerSocket.accept();
+                System.out.println("Server: New incoming connection");
                 startPolling();
                 handleConnection(mSocket);
+                System.out.println("Server: Connection closed");
                 mSocket = null;
             }
         } catch (InterruptedIOException|InterruptedException e) {
             System.out.println("Server: Shutting down due to interruption");
         } catch (IOException e) {
-            System.err.println("Server: Shutting down due to unexpected error");
-            e.printStackTrace();
+            if (e.toString().contains("Socket closed")) {
+                System.out.println("Server: Shutting down due to server closed");
+            } else {
+                System.err.println("Server: Shutting down due to unexpected error");
+                e.printStackTrace();
+            }
         } finally {
             stopPolling();
         }
@@ -109,5 +116,17 @@ public class Server extends TransferPoint {
         mOut.writeUTF(HELLO);
         mOut.flush();
         return true;
+    }
+
+    @Override public void close() {
+        if (mServerSocket != null) {
+            try {
+                mServerSocket.close();
+            } catch (IOException e) {
+                System.err.println("Service: Failed to close server socket");
+                e.printStackTrace();
+            }
+        }
+        super.close();
     }
 }
