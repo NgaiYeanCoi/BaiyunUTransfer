@@ -30,7 +30,7 @@ import static xyz.nyc1.NetworkIpInterface.getHostIPs;
  * @author NgaiYeanCoi
  * */
 
-public class mainUI implements Callback {
+public class MainUI implements Callback {
     /**
      * 主要的UI界面
      */
@@ -42,7 +42,7 @@ public class mainUI implements Callback {
     private JPanel centerPanel;
     private String currentCard = "default";
     private String mainColor = "#e6eef2";
-    private String viceColor = "#f0f7fa";
+    private String viceColor = "#f0f7fa"; //默认
     /*发送面板*/
     private JTextField ipSegment1;
     private JTextField ipSegment2;
@@ -50,11 +50,11 @@ public class mainUI implements Callback {
     private JTextField ipSegment4;
     private JTextField sendPortTextField;
     private JTextArea sendLogTextArea;
-    private JButton connectButton;
-    private JButton disconnectButton;
-    private JButton selectFileButton;
-    private JButton sendFileButton;
-    private JButton cancelSelectedButton;
+    private JButton connectBtn;
+    private JButton disconnectBtn;
+    private JButton selectFileBtn;
+    private JButton sendFileBtn;
+    private JButton cancelSelectedBtn;
     /*发送面板*/
     private JPanel rightSendPanel;
     private JPanel sendTopPanel;
@@ -72,7 +72,7 @@ public class mainUI implements Callback {
     private JPanel defaultPanel;
 
 
-    public mainUI() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public MainUI() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         createUI();
     }
 
@@ -83,7 +83,7 @@ public class mainUI implements Callback {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setResizable(false);
-        ImageIcon icon32 = new ImageIcon(Objects.requireNonNull(mainUI.class.getResource("/images/icon32x32.png")));
+        ImageIcon icon32 = new ImageIcon(Objects.requireNonNull(MainUI.class.getResource("/images/icon32x32.png")));
         mainFrame.setIconImage(icon32.getImage());
 
         // 创建主面板
@@ -111,7 +111,7 @@ public class mainUI implements Callback {
         leftPanel.add(leftLogoLabel);
         leftPanel.add(Box.createVerticalStrut(40));
 
-        /*创建功能按钮*/
+        // 创建功能按钮
         JButton leftSendBtn = new JButton("发送");
         leftSendBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         leftPanel.add(leftSendBtn);
@@ -125,6 +125,13 @@ public class mainUI implements Callback {
         JButton leftSettingBtn = new JButton("设置");
         leftSettingBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         leftPanel.add(leftSettingBtn);
+        leftPanel.add(Box.createVerticalStrut(45));
+
+        ImageIcon settingLogo = new ImageIcon(Objects.requireNonNull(MainUI.class.getResource("/images/icon200x200.png")));
+        ImageIcon settingLogoIcon = ImageReset.createRolloverIcon(settingLogo,0.2f); //半透明效果
+        JLabel settingLogoLabel = new JLabel(settingLogoIcon);
+        settingLogoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        leftPanel.add(settingLogoLabel);
 
         mainPanel.add(leftPanel, BorderLayout.WEST);
 
@@ -155,31 +162,36 @@ public class mainUI implements Callback {
         sendTopPanel = new JPanel();
         sendTopPanel.setLayout(new FlowLayout());
         sendTopPanel.setBackground(Color.decode(viceColor));
-        // 创建IPV4控件
+        // 创建IPV4组件
         JLabel ipLabel = new JLabel("IP地址:");
         ipLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 15));
         ipLabel.setBorder(BorderFactory.createEmptyBorder(0,5,0,0));
-        ipSegment1 = new JTextField(5);
-        ipSegment2 = new JTextField(5);
-        ipSegment3 = new JTextField(5);
-        ipSegment4 = new JTextField(5);
+        ipSegment1 = new JTextField(3);
+        ipSegment2 = new JTextField(3);
+        ipSegment3 = new JTextField(3);
+        ipSegment4 = new JTextField(3);
+        ipSegment1.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
+        ipSegment2.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
+        ipSegment3.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
+        ipSegment4.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
         // 传入applyIPSegmentPattern检查输入
         applyIPSegmentPattern(ipSegment1);
         applyIPSegmentPattern(ipSegment2);
         applyIPSegmentPattern(ipSegment3);
         applyIPSegmentPattern(ipSegment4);
-        // 创建端口Label组件
+        // 创建端口组件
         JLabel sendPortLabel = new JLabel("端口:");
         sendPortLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 15));
-        sendPortTextField = new JTextField(8);
+        sendPortTextField = new JTextField(5);
+        sendPortTextField.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
         applyPortPattern(sendPortTextField);
         sendPortLabel.setBorder(BorderFactory.createEmptyBorder(0,10,0,0));//设置portLabel的边框
         // 创建按钮
-        connectButton = new JButton("连接");
-        disconnectButton = new JButton("断开连接");
-        selectFileButton = new JButton("选择发送文件");
-        sendFileButton = new JButton("确认发送");
-        cancelSelectedButton = new JButton("取消选择");
+        connectBtn = new JButton("连接");
+        disconnectBtn = new JButton("断开连接");
+        selectFileBtn = new JButton("选择发送文件");
+        sendFileBtn = new JButton("确认发送");
+        cancelSelectedBtn = new JButton("取消选择");
         /*添加组件到顶部面板*/
             // IPv4输入面板
             sendTopPanel.add(ipLabel);
@@ -194,8 +206,8 @@ public class mainUI implements Callback {
             sendTopPanel.add(sendPortLabel);
             sendTopPanel.add(sendPortTextField);
             // 按钮面板
-            sendTopPanel.add(connectButton);
-            sendTopPanel.add(disconnectButton);
+            sendTopPanel.add(connectBtn);
+            sendTopPanel.add(disconnectBtn);
         //设置topPanel的边框
         sendTopPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         // 添加面板到右侧面板
@@ -204,6 +216,7 @@ public class mainUI implements Callback {
         // 创建日志文本区域
         sendLogTextArea = new JTextArea();
         sendLogTextArea.setEditable(false);
+        sendLogTextArea.setBackground(Color.decode(viceColor));
         JScrollPane sendCenterScrollPane = new JScrollPane(sendLogTextArea);
         sendCenterScrollPane.setBorder(null);
         sendCenterScrollPane.setPreferredSize(new Dimension(0, 500)); // 设置滚动面板的首选大小
@@ -214,20 +227,20 @@ public class mainUI implements Callback {
         bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout());
         bottomPanel.setBackground(Color.decode(viceColor));
-        bottomPanel.add(selectFileButton);
-        bottomPanel.add(sendFileButton);
-        bottomPanel.add(cancelSelectedButton);
+        bottomPanel.add(selectFileBtn);
+        bottomPanel.add(sendFileBtn);
+        bottomPanel.add(cancelSelectedBtn);
         // 初始按钮为不可见
-        sendFileButton.setVisible(false);
-        selectFileButton.setVisible(false);
-        disconnectButton.setVisible(false);
-        cancelSelectedButton.setVisible(false);
+        sendFileBtn.setVisible(false);
+        selectFileBtn.setVisible(false);
+        disconnectBtn.setVisible(false);
+        cancelSelectedBtn.setVisible(false);
         // 设置bottomPanel的边框
         //bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         rightSendPanel.add(bottomPanel,BorderLayout.SOUTH);//添加底部面板到右侧面板
 
         // 添加连接按钮事件监听器
-        connectButton.addActionListener(new ActionListener() {
+        connectBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String ip = ipSegment1.getText() + "." + ipSegment2.getText() + "." + ipSegment3.getText() + "." + ipSegment4.getText();
@@ -251,9 +264,9 @@ public class mainUI implements Callback {
                     // TODO:添加连接服务器的代码，需要连接后端API
                     sendLogTextArea.append("正在连接到 " + ip + ":" + port + "中...\n");
                     sendLogTextArea.append("已成功连接！\n");
-                    connectButton.setVisible(false);
-                    selectFileButton.setVisible(true);
-                    disconnectButton.setVisible(true);
+                    connectBtn.setVisible(false);
+                    selectFileBtn.setVisible(true);
+                    disconnectBtn.setVisible(true);
 
 
                 }
@@ -261,23 +274,23 @@ public class mainUI implements Callback {
             }
         });
 
-        disconnectButton.addActionListener(new ActionListener() {
+        disconnectBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String ip = ipSegment1.getText() + "." + ipSegment2.getText() + "." + ipSegment3.getText();
                 String port = sendPortTextField.getText();
                 // TODO:断开连接，需要后端api
                 sendLogTextArea.append(ip + ":" + port + " 已断开连接\n");
-                disconnectButton.setVisible(false);
-                selectFileButton.setVisible(false);
-                sendFileButton.setVisible(false);
-                connectButton.setVisible(true);
-                cancelSelectedButton.setVisible(false);
+                disconnectBtn.setVisible(false);
+                selectFileBtn.setVisible(false);
+                sendFileBtn.setVisible(false);
+                connectBtn.setVisible(true);
+                cancelSelectedBtn.setVisible(false);
                 globalFilePath = null;
             }
         });
 
-        selectFileButton.addActionListener(new ActionListener() {
+        selectFileBtn.addActionListener(new ActionListener() {
             /**
              * 新增模态化，选择文件发送的窗口
              * */
@@ -324,9 +337,9 @@ public class mainUI implements Callback {
                                     globalFilePath = file.getAbsolutePath();
                                     sendLogTextArea.append("已选择文件 " + globalFilePath + "\n");
                                     selectFileDialog.dispose();
-                                    selectFileButton.setVisible(false);
-                                    cancelSelectedButton.setVisible(true);
-                                    sendFileButton.setVisible(true);
+                                    selectFileBtn.setVisible(false);
+                                    cancelSelectedBtn.setVisible(true);
+                                    sendFileBtn.setVisible(true);
 
                                 }
                                 else{
@@ -353,9 +366,9 @@ public class mainUI implements Callback {
                             sendLogTextArea.append("已选择文件: " + globalFilePath + "\n");
                             if (!globalFilePath.isEmpty()) {
                                 selectFileDialog.dispose();
-                                selectFileButton.setVisible(false);
-                                cancelSelectedButton.setVisible(true);
-                                sendFileButton.setVisible(true);
+                                selectFileBtn.setVisible(false);
+                                cancelSelectedBtn.setVisible(true);
+                                sendFileBtn.setVisible(true);
                             }
                         }
                     }
@@ -365,7 +378,7 @@ public class mainUI implements Callback {
             }
         });
 
-        sendFileButton.addActionListener(new ActionListener() {
+        sendFileBtn.addActionListener(new ActionListener() {
             /**
              *  发送文件按钮监听事件
              * */
@@ -374,10 +387,13 @@ public class mainUI implements Callback {
                 // TODO:发送文件，需要后端api
                 sendLogTextArea.append("发送文件中...\n");
                 sendLogTextArea.append("发送成功！\n");
+                selectFileBtn.setVisible(true);
+                sendFileBtn.setVisible(false);
+                cancelSelectedBtn.setVisible(false);
             }
         });
 
-        cancelSelectedButton.addActionListener(new ActionListener() {
+        cancelSelectedBtn.addActionListener(new ActionListener() {
             /**
              *  "取消选择"按钮监听事件
              * */
@@ -385,9 +401,9 @@ public class mainUI implements Callback {
             public void actionPerformed(ActionEvent e) {
                 sendLogTextArea.append("已取消选取文件" + globalFilePath + "\n");
                 globalFilePath = null;
-                selectFileButton.setVisible(true);
-                sendFileButton.setVisible(false);
-                cancelSelectedButton.setVisible(false);
+                selectFileBtn.setVisible(true);
+                sendFileBtn.setVisible(false);
+                cancelSelectedBtn.setVisible(false);
             }
         });
 
@@ -418,7 +434,8 @@ public class mainUI implements Callback {
         receivePortLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 15));
         receivePortLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         // 创建端口输入框
-        JTextField receivePortTextField = new JTextField(8);
+        JTextField receivePortTextField = new JTextField(5);
+        receivePortTextField.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
         applyPortPattern(receivePortTextField); // 应用端口号输入正则表达式
         // 创建监听按钮
         JButton receiveListenBtn = new JButton("监听端口");
@@ -440,7 +457,7 @@ public class mainUI implements Callback {
         // 创建日志文本区域
         receiveLogTextArea = new JTextArea();
         receiveLogTextArea.setEditable(false);
-        //receiveLogTextArea.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 10));
+        receiveLogTextArea.setBackground((Color.decode(viceColor)));
         JScrollPane receiveCenterScrollPane = new JScrollPane(receiveLogTextArea);
         receiveCenterScrollPane.setPreferredSize(new Dimension(0, 500)); // 设置滚动面板的首选大小
         receiveCenterScrollPane.setBorder(null);
@@ -506,6 +523,7 @@ public class mainUI implements Callback {
         settingInfoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         settingPanel.add(settingInfoLabel);//将settingInfoLabel添加进settingTopPanel里
         settingPanel.add(settingTopPanel, BorderLayout.NORTH);
+
 
 
         // 创建中间设置选项面板
@@ -738,7 +756,7 @@ public class mainUI implements Callback {
         // 获取textField的Document并设置DocumentFilter
         ((AbstractDocument) textField.getDocument()).setDocumentFilter(filter);
     }
-    private void changeStyle(String mainColor,String viceColor){
+    private void changeStyle(String mainColor,String viceColor){ // 切换主题
         leftPanel.setBackground(Color.decode(mainColor));
         defaultPanel.setBackground(Color.decode(viceColor));
         rightSendPanel.setBackground(Color.decode(viceColor));
@@ -749,10 +767,14 @@ public class mainUI implements Callback {
         settingPanel.setBackground(Color.decode(viceColor));
         settingTopPanel.setBackground(Color.decode(viceColor));
         settingCenterPanel.setBackground(Color.decode(viceColor));
-
+        sendLogTextArea.setBackground(Color.decode(viceColor));
+        receiveLogTextArea.setBackground((Color.decode(viceColor)));
     }
 
     static class CenteredComboBoxRenderer extends DefaultListCellRenderer {
+        /*
+        * 使Label居中显示
+        * */
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             // 调用父类方法获取组件

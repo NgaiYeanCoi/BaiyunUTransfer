@@ -13,7 +13,7 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new mainUI();
+                    new MainUI();
                 } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException |
                          IllegalAccessException e) {
                     throw new RuntimeException(e);
