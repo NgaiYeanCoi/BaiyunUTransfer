@@ -14,16 +14,12 @@ public class Main {
             public void run() {
                 try {
                     new mainUI();
-                } catch (UnsupportedLookAndFeelException e) {
-                    throw new RuntimeException(e);
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (InstantiationException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
+                } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException |
+                         IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
                 //ReceiveRequestUI.DemoTest();
+
             }
         });
     }
