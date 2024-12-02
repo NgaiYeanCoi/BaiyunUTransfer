@@ -72,7 +72,17 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //
                 mainFrame.dispose();
-                new mainUI();
+                try {
+                    new mainUI();
+                } catch (UnsupportedLookAndFeelException ex) {
+                    throw new RuntimeException(ex);
+                } catch (ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InstantiationException ex) {
+                    throw new RuntimeException(ex);
+                } catch (IllegalAccessException ex) {
+                    throw new RuntimeException(ex);
+                }
                 System.out.println("client");
             }
         });

@@ -12,7 +12,17 @@ public class Main {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new mainUI();
+                try {
+                    new mainUI();
+                } catch (UnsupportedLookAndFeelException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (InstantiationException e) {
+                    throw new RuntimeException(e);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
                 //ReceiveRequestUI.DemoTest();
             }
         });
