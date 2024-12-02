@@ -22,6 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * 抽象的连接端点类，可以是服务端也可以是客户端
@@ -70,11 +71,21 @@ public abstract class TransferPoint extends Thread implements Closeable {
      * 创建新的连接端点
      * @param callback 事件回调
      */
-    public TransferPoint(String tag, Callback callback){
+    public TransferPoint(String tag, String downloadDir, Callback callback) {
         super(tag + "-Thread");
         setPriority(Thread.MAX_PRIORITY);
         mTag = tag;
         mCallback = callback;
+
+        if (downloadDir == null) {
+            File defaultDownloadDir = new File(FileSystemView.getFileSystemView().getHomeDirectory(), "云移");
+            defaultDownloadDir.mkdirs();
+            setDownloadDir(defaultDownloadDir);
+        } else {
+            setDownloadDir(new File(downloadDir));
+        }
+
+        System.out.println(mTag + ": Create with " + mBaseDownloadPath);
     }
 
     /**
@@ -221,7 +232,8 @@ public abstract class TransferPoint extends Thread implements Closeable {
                         mOut.flush();
                     } else {
                         Request req = new Request();
-                        SwingUtilities.invokeLater(() -> mCallback.onReceiveFile(TransferPoint.this, filename, req));
+                        SwingUtilities.invokeLater(() -> mCallback.onReceiveFile(
+                                TransferPoint.this, filename, mSocket.getInetAddress().getHostAddress(), req));
                         if (req.await()) {
                             System.out.println(mTag + ": Accepted file transfer request");
                             acceptFile(filename);
@@ -374,8 +386,18 @@ public abstract class TransferPoint extends Thread implements Closeable {
      * 关闭此端点并等待所有操作完成
      */
     @Override public void close() {
+        System.out.println(mTag + ": Close");
         interrupt();
         stopPolling();
+        Socket socket = mSocket;
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                System.err.println(mTag + ": Failed to close socket");
+                e.printStackTrace();
+            }
+        }
         try {
             join();
         } catch (InterruptedException e) {
