@@ -71,7 +71,6 @@ public class MainUI implements Callback {
     /*默认面板*/
     private JPanel defaultPanel;
 
-
     public MainUI() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         createUI();
     }
@@ -262,6 +261,7 @@ public class MainUI implements Callback {
                 }
                 else {
                     // TODO:添加连接服务器的代码，需要连接后端API
+                    leftReceiveBtn.setEnabled(false);
                     sendLogTextArea.append("正在连接到 " + ip + ":" + port + "中...\n");
                     sendLogTextArea.append("已成功连接！\n");
                     connectBtn.setVisible(false);
@@ -286,6 +286,7 @@ public class MainUI implements Callback {
                 sendFileBtn.setVisible(false);
                 connectBtn.setVisible(true);
                 cancelSelectedBtn.setVisible(false);
+                leftReceiveBtn.setEnabled(true);
                 globalFilePath = null;
             }
         });
@@ -485,7 +486,7 @@ public class MainUI implements Callback {
                     receiveLogTextArea.append("正在监听本机"+receivePortTextField.getText()+"端口中...\n");
                     receiveListenBtn.setVisible(false);
                     receivePauseListenBtn.setVisible(true);
-
+                    leftSendBtn.setEnabled(false);
                 }
             }
         });
@@ -498,6 +499,7 @@ public class MainUI implements Callback {
                 receiveLogTextArea.append("已停止监听\n");
                 receivePauseListenBtn.setVisible(false);
                 receiveListenBtn.setVisible(true);
+                leftSendBtn.setEnabled(true);
             }
         });
 
@@ -669,6 +671,7 @@ public class MainUI implements Callback {
 
         mainFrame.setVisible(true);
     }
+
     private void addSettingLabel(String labelName){
         JLabel label = new JLabel(labelName);
         label.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 16));
@@ -676,13 +679,14 @@ public class MainUI implements Callback {
         settingGbc.weightx = 1.0; // 让标签占据更多空间
         settingCenterPanel.add(label, settingGbc);
     }
+
     private  void addSettingBtn(JButton button){
         settingGbc.gridx = 1;
         settingGbc.weightx = 0.0; // 按钮不需要额外空间
         settingCenterPanel.add(button, settingGbc);
         settingGbc.gridy++;  // 移动到下一行
-
     }
+
     private void applyPortPattern(JTextField textField) {
         /* *
          * 端口号输入正则表达匹配检查
@@ -720,6 +724,7 @@ public class MainUI implements Callback {
         // 获取textField的Document并设置DocumentFilter
         ((AbstractDocument) textField.getDocument()).setDocumentFilter(filter);
     }
+
     private void applyIPSegmentPattern(JTextField textField) {
         /* *
          * IPv4段的正则表达匹配
@@ -756,6 +761,7 @@ public class MainUI implements Callback {
         // 获取textField的Document并设置DocumentFilter
         ((AbstractDocument) textField.getDocument()).setDocumentFilter(filter);
     }
+
     private void changeStyle(String mainColor,String viceColor){ // 切换主题
         leftPanel.setBackground(Color.decode(mainColor));
         defaultPanel.setBackground(Color.decode(viceColor));
