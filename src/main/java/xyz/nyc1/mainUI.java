@@ -22,8 +22,6 @@ import java.io.File;
 import java.net.URI;
 import java.awt.Desktop;
 import java.util.List;
-import java.util.Objects;
-
 import static xyz.nyc1.NetworkIpInterface.getHostIPs;
 
 /**
@@ -159,10 +157,10 @@ public class mainUI implements Callback {
         JLabel ipLabel = new JLabel("IP地址:");
         ipLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 15));
         ipLabel.setBorder(BorderFactory.createEmptyBorder(0,5,0,0));
-        ipSegment1 = new JTextField(3);
-        ipSegment2 = new JTextField(3);
-        ipSegment3 = new JTextField(3);
-        ipSegment4 = new JTextField(3);
+        ipSegment1 = new JTextField(5);
+        ipSegment2 = new JTextField(5);
+        ipSegment3 = new JTextField(5);
+        ipSegment4 = new JTextField(5);
         // 传入applyIPSegmentPattern检查输入
         applyIPSegmentPattern(ipSegment1);
         applyIPSegmentPattern(ipSegment2);
@@ -171,7 +169,7 @@ public class mainUI implements Callback {
         // 创建端口Label组件
         JLabel sendPortLabel = new JLabel("端口:");
         sendPortLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 15));
-        sendPortTextField = new JTextField(5);
+        sendPortTextField = new JTextField(8);
         applyPortPattern(sendPortTextField);
         sendPortLabel.setBorder(BorderFactory.createEmptyBorder(0,10,0,0));//设置portLabel的边框
         // 创建按钮
@@ -410,6 +408,7 @@ public class mainUI implements Callback {
         // 创建IP地址显示区域
         JTextArea ipTextArea = new JTextArea(5, 20);
         ipTextArea.setEditable(false);
+        ipTextArea.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
         ipTextArea.setText(getHostIPs()); // 获取并显示主机的IP地址
         ipTextArea.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         // 创建端口Label组件
@@ -417,7 +416,7 @@ public class mainUI implements Callback {
         receivePortLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 15));
         receivePortLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         // 创建端口输入框
-        JTextField receivePortTextField = new JTextField(5);
+        JTextField receivePortTextField = new JTextField(8);
         applyPortPattern(receivePortTextField); // 应用端口号输入正则表达式
         // 创建监听按钮
         JButton receiveListenBtn = new JButton("监听端口");
@@ -439,6 +438,7 @@ public class mainUI implements Callback {
         // 创建日志文本区域
         receiveLogTextArea = new JTextArea();
         receiveLogTextArea.setEditable(false);
+        //receiveLogTextArea.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 10));
         JScrollPane receiveCenterScrollPane = new JScrollPane(receiveLogTextArea);
         receiveCenterScrollPane.setPreferredSize(new Dimension(0, 500)); // 设置滚动面板的首选大小
         receiveCenterScrollPane.setBorder(null);
