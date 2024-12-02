@@ -247,7 +247,6 @@ public class MainUI extends WindowAdapter implements Callback {
         cancelSelectedBtn.setVisible(false);
         // 设置bottomPanel的边框
         //bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        rightSendPanel.add(bottomPanel,BorderLayout.SOUTH);//添加底部面板到右侧面板
 
         // 添加连接按钮事件监听器
         connectBtn.addActionListener(e -> {
@@ -459,7 +458,6 @@ public class MainUI extends WindowAdapter implements Callback {
         receiveCenterScrollPane.setPreferredSize(new Dimension(0, 500)); // 设置滚动面板的首选大小
         receiveCenterScrollPane.setBorder(null);
         rightReceivePanel.add(receiveCenterScrollPane,BorderLayout.CENTER);
-        rightReceivePanel.add(bottomPanel,BorderLayout.SOUTH);//添加底部面板到右侧面板
 
         // 添加监听按钮事件监听器
         receiveListenBtn.addActionListener(e -> {
@@ -770,14 +768,21 @@ public class MainUI extends WindowAdapter implements Callback {
     public void onNewConnection(TransferPoint transferPoint, String address, Request request) {
         if (request != null) request.accept();
         String msg = "已成功连接到 " + address + "\n";
+        selectFileBtn.setVisible(true);
         if (transferPoint instanceof Server) {
             receiveLogTextArea.append(msg);
+            rightReceivePanel.add(bottomPanel,BorderLayout.SOUTH);//添加底部面板到右侧面板
         } else {
             sendLogTextArea.append(msg);
+            rightSendPanel.add(bottomPanel,BorderLayout.SOUTH);//添加底部面板到右侧面板
             connectBtn.setVisible(false);
             disconnectBtn.setVisible(true);
         }
-        selectFileBtn.setVisible(true);
+//        bottomPanel.invalidate();
+//        bottomPanel.revalidate();
+//        bottomPanel.validate();
+//        bottomPanel.repaint();
+        SwingUtilities.updateComponentTreeUI(bottomPanel);
     }
 
     @Override
@@ -787,26 +792,35 @@ public class MainUI extends WindowAdapter implements Callback {
         } else {
             sendLogTextArea.append("连接失败，请检查网络、目标主机地址及端口号！\n" + e + "\n");
         }
+        if (transferPoint instanceof Server) {
+            rightReceivePanel.remove(bottomPanel);
+        } else {
+            rightSendPanel.remove(bottomPanel);
+        }
         leftReceiveBtn.setEnabled(true);
         connectBtn.setEnabled(true);
+        SwingUtilities.updateComponentTreeUI(bottomPanel);
     }
 
     @Override
     public void onLostConnection(TransferPoint transferPoint, String address) {
         String msg = address + " 已断开连接\n";
+        disconnectBtn.setVisible(false);
+        selectFileBtn.setVisible(false);
+        sendFileBtn.setVisible(false);
+        cancelSelectedBtn.setVisible(false);
         if (transferPoint instanceof Server) {
             receiveLogTextArea.append(msg);
+            rightReceivePanel.remove(bottomPanel);
         } else {
             sendLogTextArea.append(msg);
-            disconnectBtn.setVisible(false);
-            selectFileBtn.setVisible(false);
-            sendFileBtn.setVisible(false);
+            rightSendPanel.remove(bottomPanel);
             connectBtn.setEnabled(true);
             connectBtn.setVisible(true);
-            cancelSelectedBtn.setVisible(false);
             leftReceiveBtn.setEnabled(true);
             globalFilePath = null;
         }
+        SwingUtilities.updateComponentTreeUI(bottomPanel);
     }
 
     @Override
