@@ -16,18 +16,26 @@ import xyz.nyc1.backend.Request;
  * */
 
 public class ReceiveRequestUI {
-    static JFrame mainFrame = new JFrame("test");
+    private JFrame mainFrame;
+    private JDialog receiveFileRequestDialog;
 
+    public ReceiveRequestUI() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        show("D:/test","127.0.0.1");
+    }
 
-    public static void show(String filename, String address, Request request) {
+    public void show(String filename, String address) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        mainFrame = new JFrame("接收请求");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭操作
         mainFrame.setSize(500, 400);
         mainFrame.setResizable(false); // 禁止窗口调整大小
         mainFrame.setLocationRelativeTo(null);
         mainFrame.getContentPane().setBackground(new Color(255, 255, 255)); // 设置窗口的背景颜色为白色
 
+        String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+        UIManager.setLookAndFeel(lookAndFeel);
+
         // 创建模态对话框
-        JDialog receiveFileRequestDialog = new JDialog(mainFrame, "接收文件", true); // 设置为模态
+        receiveFileRequestDialog = new JDialog(mainFrame, "接收文件", true); // 设置为模态
         receiveFileRequestDialog.setSize(900, 600);
         receiveFileRequestDialog.setLocationRelativeTo(null); // 居中显示
         receiveFileRequestDialog.setResizable(false); // 禁止调整大小
@@ -100,8 +108,8 @@ public class ReceiveRequestUI {
 
         receiveAcceptBtn.addActionListener(e -> {
             System.out.println("accept");
-            request.accept();
-            creatProgressBar(receiveFileRequestDialog);
+            //request.accept();
+            creatProgressBar(mainFrame);
             //receiveFileRequestDialog.dispose();
         });
         receiveRejectBtn.addActionListener(e -> {
@@ -109,7 +117,7 @@ public class ReceiveRequestUI {
             int result = JOptionPane.showConfirmDialog(receiveFileRequestDialog,"你确定要取消接收吗？","提示",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
             if (result == JOptionPane.YES_OPTION){
                 System.out.println("yes");
-                request.decline();
+                //request.decline();
                 receiveFileRequestDialog.dispose();
             }
             else if(result == JOptionPane.NO_OPTION||result == JOptionPane.CLOSED_OPTION){
@@ -127,23 +135,13 @@ public class ReceiveRequestUI {
         receiveFileRequestDialog.setVisible(true);
 
     }
-    private static int progressBarCancel(Component parentComponent){
-        int result = JOptionPane.showConfirmDialog(parentComponent,"你确定要取消接收吗？","提示",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
-        if (result == JOptionPane.YES_OPTION){
-            System.out.println("yes");
-        }
-        else if(result == JOptionPane.NO_OPTION||result == JOptionPane.CLOSED_OPTION){
-            System.out.println("cancel");
-        }
-        return result;
-    }
-    private static void creatProgressBar(Component parentComponent){
+    private void creatProgressBar(Component parentComponent){
         JDialog progressDialog = new JDialog((Frame) parentComponent, "接收文件", true); // 设置为模态
         progressDialog.setSize(300, 100);
         progressDialog.setLocationRelativeTo(null); // 居中显示
         progressDialog.setResizable(false); // 禁止调整大小
         progressDialog.setAlwaysOnTop(true);
-        progressDialog.setDefaultCloseOperation(progressBarCancel(mainFrame)); // 设置关闭操作
+        progressDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
         JProgressBar progressBar = new JProgressBar();// 创建进度条对象
@@ -151,6 +149,9 @@ public class ReceiveRequestUI {
         progressBar.setIndeterminate(true);// 设置采用不确定进度条
         progressBar.setString("正在传输中...");// 设置提示信息
         JButton cancelBtn = new JButton("取消");
+
+        //TODO:当文件传输完之后需要接回调弹出窗口表示传输成功然后关闭该界面所有窗口
+
         // 将进度条和取消按钮添加到面板
         panel.add(progressBar, BorderLayout.CENTER);
         panel.add(cancelBtn, BorderLayout.SOUTH);
@@ -158,7 +159,17 @@ public class ReceiveRequestUI {
         cancelBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                progressBarCancel(mainFrame);
+                int result = JOptionPane.showConfirmDialog(progressDialog,"你确定要取消接收吗？","提示",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+                if (result == JOptionPane.YES_OPTION){
+                    System.out.println("yes");
+                    progressDialog.dispose();
+                    receiveFileRequestDialog.dispose();
+                    //TODO：需接后端API
+
+                }
+                else if(result == JOptionPane.NO_OPTION||result == JOptionPane.CLOSED_OPTION){
+                    System.out.println("cancel");
+                }
             }
         });
         // 将面板添加到对话框

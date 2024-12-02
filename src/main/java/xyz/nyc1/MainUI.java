@@ -804,7 +804,7 @@ public class MainUI extends WindowAdapter implements Callback {
 
     @Override
     public void onReceiveFile(TransferPoint transferPoint, String filename, String address, Request request) {
-        ReceiveRequestUI.show(filename, address, request);
+        //ReceiveRequestUI.show(filename, address, request);
     }
 
     @Override
