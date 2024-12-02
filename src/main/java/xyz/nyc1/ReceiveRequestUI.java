@@ -98,12 +98,16 @@ public class ReceiveRequestUI {
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
         receiveFileRequestDialog.add(mainPanel);
 
+
+
         receiveAcceptBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //TODO:接收文件同意，需接后端API
                 System.out.println("accept");
+                creatProgressBar(receiveFileRequestDialog);
                 //receiveFileRequestDialog.dispose();
+
             }
         });
         receiveRejectBtn.addActionListener(new ActionListener() {
@@ -111,7 +115,17 @@ public class ReceiveRequestUI {
             public void actionPerformed(ActionEvent e) {
                 //TODO:接收文件拒绝，需接后端API
                 System.out.println("decline");
+                int result = JOptionPane.showConfirmDialog(receiveFileRequestDialog,"你确定要取消接收吗？","提示",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+                if (result == JOptionPane.YES_OPTION){
+                    System.out.println("yes");
+                    receiveFileRequestDialog.dispose();
+                }
+                else if(result == JOptionPane.NO_OPTION||result == JOptionPane.CLOSED_OPTION){
+                    System.out.println("cancel");
+
+                }
                 //receiveFileRequestDialog.dispose();
+
             }
         });
 
@@ -123,4 +137,43 @@ public class ReceiveRequestUI {
         receiveFileRequestDialog.setVisible(true);
 
     }
+    private static int progressBarCancel(Component parentComponent){
+        int result = JOptionPane.showConfirmDialog(parentComponent,"你确定要取消接收吗？","提示",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
+        if (result == JOptionPane.YES_OPTION){
+            System.out.println("yes");
+        }
+        else if(result == JOptionPane.NO_OPTION||result == JOptionPane.CLOSED_OPTION){
+            System.out.println("cancel");
+        }
+        return result;
+    }
+    private static void creatProgressBar(Component parentComponent){
+        JDialog progressDialog = new JDialog((Frame) parentComponent, "接收文件", true); // 设置为模态
+        progressDialog.setSize(300, 100);
+        progressDialog.setLocationRelativeTo(null); // 居中显示
+        progressDialog.setResizable(false); // 禁止调整大小
+        progressDialog.setAlwaysOnTop(true);
+        progressDialog.setDefaultCloseOperation(progressBarCancel(mainFrame)); // 设置关闭操作
+
+        JPanel panel = new JPanel(new BorderLayout());
+        JProgressBar progressBar = new JProgressBar();// 创建进度条对象
+        progressBar.setStringPainted(true);// 设置显示提示信息
+        progressBar.setIndeterminate(true);// 设置采用不确定进度条
+        progressBar.setString("正在传输中...");// 设置提示信息
+        JButton cancelBtn = new JButton("取消");
+        // 将进度条和取消按钮添加到面板
+        panel.add(progressBar, BorderLayout.CENTER);
+        panel.add(cancelBtn, BorderLayout.SOUTH);
+        // 设置取消按钮的点击事件
+        cancelBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                progressBarCancel(mainFrame);
+            }
+        });
+        // 将面板添加到对话框
+        progressDialog.add(panel);
+        progressDialog.setVisible(true);
+    }
+
 }
