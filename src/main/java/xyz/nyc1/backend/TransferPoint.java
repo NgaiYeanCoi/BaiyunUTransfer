@@ -168,7 +168,7 @@ public abstract class TransferPoint extends Thread implements Closeable {
             try (FileInputStream fis = new FileInputStream(file)) {
                 // 创建 MD5 校验和
                 MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-                byte[] buf = new byte[8192];
+                byte[] buf = new byte[1024 * 1024];
                 for (;;) {
                     int len = fis.read(buf);
                     if (len < 0) {
@@ -280,7 +280,7 @@ public abstract class TransferPoint extends Thread implements Closeable {
         mOut.writeUTF(REPLY_OK);
         mOut.flush();
         File outputFile = generateOutputFile(filename);
-        byte[] buf = new byte[8192];
+        byte[] buf = new byte[1024 * 1024];
         boolean done = false;
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
             // 创建 MessageDigest 对象 用于获取接收后的MD5
