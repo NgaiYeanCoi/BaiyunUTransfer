@@ -72,17 +72,13 @@ public abstract class TransferPoint extends Thread implements Closeable {
      * 创建新的连接端点
      * @param callback 事件回调
      */
-    public TransferPoint(String tag, String downloadDir, Callback callback) {
+    public TransferPoint(String tag, Callback callback) {
         super(tag + "-Thread");
         setPriority(Thread.MAX_PRIORITY);
         mTag = tag;
         mCallback = callback;
 
-        if (downloadDir != null) {
-            setDownloadDir(new File(downloadDir));
-        }
-
-        System.out.println(mTag + ": Create with " + downloadDir);
+        System.out.println(mTag + ": Created");
     }
 
     /**

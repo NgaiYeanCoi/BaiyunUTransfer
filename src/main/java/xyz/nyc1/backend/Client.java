@@ -24,8 +24,8 @@ public class Client extends TransferPoint {
      * @param port 服务器端口号
      * @param callback 当收到新事件时，响应的回调
      */
-    public Client(String address, int port, String downloadDir, Callback callback) {
-        super("Client", downloadDir, callback);
+    public Client(String address, int port, Callback callback) {
+        super("Client", callback);
         this.address = address;
         this.port = port;
         mSocket = new Socket();

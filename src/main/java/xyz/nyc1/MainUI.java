@@ -39,7 +39,6 @@ import static xyz.nyc1.NetworkIpInterface.getHostIPs;
 public class MainUI extends WindowAdapter implements Callback {
     private TransferPoint transferPoint;
     private ReceiveRequestUI receiveRequestUI;
-    private String selectedDownloadDir;
 
     /**
      * 主要的UI界面
@@ -265,7 +264,7 @@ public class MainUI extends WindowAdapter implements Callback {
                 new ErrorDialog(mainFrame, "端口不得大于65535");
             } else {
                 sendLogTextArea.append("正在连接到 " + ip + ":" + port + "中...\n");
-                transferPoint = new Client(ip, Integer.parseInt(port), selectedDownloadDir, this);
+                transferPoint = new Client(ip, Integer.parseInt(port), this);
                 transferPoint.start();
                 leftReceiveBtn.setEnabled(false);
                 connectBtn.setEnabled(false);
@@ -475,7 +474,7 @@ public class MainUI extends WindowAdapter implements Callback {
             } else {
                 receiveLogTextArea.append("正在监听本机"+receivePortTextField.getText()+"端口中...\n");
                 try {
-                    transferPoint = new Server(Integer.parseInt(port), selectedDownloadDir, this);
+                    transferPoint = new Server(Integer.parseInt(port), this);
                     transferPoint.start();
                     selectFileBtn.setVisible(true);
                 } catch (IOException ex) {
@@ -554,7 +553,7 @@ public class MainUI extends WindowAdapter implements Callback {
         addSettingLabel("默认保存路径");
         JButton settingDefaultPathBtn = new JButton("设置");
         addSettingBtn(settingDefaultPathBtn);
-        settingDefaultPathLabel = new MarqueeLabel("asdhasjkdhkajshdkjashdksahdjkashdhasjkdhasjkdhjkadhjkasjdhjasdkasjkdhka");
+        settingDefaultPathLabel = new MarqueeLabel(TransferPoint.resolveDownloadPath().toString());
         settingDefaultPathLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 16));
         settingGbc.gridx = 0;
         settingGbc.weightx = 1.0; // 让标签占据更多空间
@@ -565,11 +564,9 @@ public class MainUI extends WindowAdapter implements Callback {
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             int result = fileChooser.showOpenDialog(mainFrame);
             if (result == JFileChooser.APPROVE_OPTION) {
-                selectedDownloadDir = fileChooser.getSelectedFile().getAbsolutePath();
-                if (transferPoint != null)
-                    transferPoint.setDownloadDir(new File(selectedDownloadDir));
-                settingDefaultPathLabel.setMarqueeText(selectedDownloadDir);
-                ;
+                File selected = fileChooser.getSelectedFile().getAbsoluteFile();
+                TransferPoint.setDownloadDir(selected);
+                settingDefaultPathLabel.setMarqueeText(selected.getAbsolutePath());
                 new InfoDialog(mainFrame,"设置默认路径成功！");
             }
         });
