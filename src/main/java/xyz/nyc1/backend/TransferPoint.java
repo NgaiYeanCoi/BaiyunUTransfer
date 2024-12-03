@@ -48,6 +48,9 @@ public abstract class TransferPoint extends Thread implements Closeable {
     /** 协议：响应头 表示请求失败 */
     static final String REPLY_FAILED = REPLY + "FAIL";
 
+
+    /** 下载到的路径 */
+    private static Path mBaseDownloadPath;
     /** 当前传输点的标签 可以是 {@link Server} 也可以是 {@link Client} */
     private final String mTag;
     /** 事件队列 被 {@link ActionPollingThread} 使用 */
@@ -56,8 +59,6 @@ public abstract class TransferPoint extends Thread implements Closeable {
     private ActionPollingThread mActionThread;
     /** 处理回应消息的回调 */
     private volatile Consumer<String> mReplyHandler;
-    /** 下载到的路径 */
-    private Path mBaseDownloadPath;
     /** 处理事件的回调 */
     final Callback mCallback;
     /** 建立的和对端的连接 */
@@ -96,7 +97,7 @@ public abstract class TransferPoint extends Thread implements Closeable {
      * 设置下载到哪个文件夹 此文件夹必须存在 若设置的文件夹无效将被重置回默认
      * @param dir 目标文件夹
      */
-    public void setDownloadDir(File dir) {
+    public static void setDownloadDir(File dir) {
         if (dir == null) {
             mBaseDownloadPath = null;
             return;
@@ -104,7 +105,7 @@ public abstract class TransferPoint extends Thread implements Closeable {
         try {
             mBaseDownloadPath = dir.toPath().toRealPath(LinkOption.NOFOLLOW_LINKS);
         } catch (IOException e) {
-            System.err.println(mTag + ": Error setting download dir to " + dir);
+            System.err.println("TransferPoint: Error setting download dir to " + dir);
             e.printStackTrace();
             mBaseDownloadPath = null;
         }
@@ -113,7 +114,7 @@ public abstract class TransferPoint extends Thread implements Closeable {
     /**
      * 获取下载路径
      */
-    public Path resolveDownloadPath() {
+    public static Path resolveDownloadPath() {
         if (mBaseDownloadPath == null || !Files.isDirectory(mBaseDownloadPath)) {
             File defaultDownloadDir = new File(FileSystemView.getFileSystemView().getHomeDirectory(), "云移");
             defaultDownloadDir.mkdirs();
