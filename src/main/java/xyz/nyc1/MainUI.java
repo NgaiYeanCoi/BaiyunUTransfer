@@ -384,6 +384,7 @@ public class MainUI extends WindowAdapter implements Callback {
                 sendLogTextArea.append("发送文件中...\n");
                 receiveLogTextArea.append("发送文件中...\n");
                 selectFileBtn.setVisible(true);
+                selectFileBtn.setEnabled(false);
                 sendFileBtn.setVisible(false);
                 cancelSelectedBtn.setVisible(false);
             }
@@ -843,6 +844,7 @@ public class MainUI extends WindowAdapter implements Callback {
     @Override
     public void onTransferSuccess(TransferPoint transferPoint, File outputFile) {
         String msg = outputFile == null ? "发送文件成功\n" : "接收文件成功，放置在 " + outputFile + "\n";
+        selectFileBtn.setEnabled(true);
         if (transferPoint instanceof Server) {
             receiveLogTextArea.append(msg);
         } else {
@@ -857,6 +859,7 @@ public class MainUI extends WindowAdapter implements Callback {
     @Override
     public void onTransferFailed(TransferPoint transferPoint, String filename) {
         String msg = "传输文件 " + filename + " 失败！\n";
+        selectFileBtn.setEnabled(true);
         if (transferPoint instanceof Server) {
             receiveLogTextArea.append(msg);
         } else {
