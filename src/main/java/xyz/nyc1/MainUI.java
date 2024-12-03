@@ -833,9 +833,9 @@ public class MainUI extends WindowAdapter implements Callback {
 
     @Override
     public void onReceiveFile(TransferPoint transferPoint, String filename, String address, Request request) {
-        receiveRequestUI = new ReceiveRequestUI();
+        receiveRequestUI = new ReceiveRequestUI(request);
         try {
-            receiveRequestUI.show(mainFrame,filename, address, request);
+            receiveRequestUI.show(mainFrame,filename, address);
         } catch (UnsupportedLookAndFeelException e) {
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {

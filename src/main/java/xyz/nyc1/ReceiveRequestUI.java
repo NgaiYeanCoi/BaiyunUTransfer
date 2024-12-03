@@ -5,6 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
@@ -17,13 +19,18 @@ import xyz.nyc1.backend.Request;
  * @author NgaiYeanCoi
  * */
 
-public class ReceiveRequestUI {
+public class ReceiveRequestUI extends WindowAdapter {
+    private Request request;
     private JDialog receiveFileRequestDialog;
     private JButton progressBtn;
     private JProgressBar progressBar;
     private JDialog progressDialog;
 
-    public void show(JFrame mainFrame,String filename, String address, Request request) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public ReceiveRequestUI(Request req) {
+        request = req;
+    }
+
+    public void show(JFrame mainFrame,String filename, String address) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         //mainFrame = new JFrame("接收请求");
         //mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置窗口关闭操作
         //mainFrame.setSize(500, 400);
@@ -43,6 +50,7 @@ public class ReceiveRequestUI {
         receiveFileRequestDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE); // 设置关闭操作
         receiveFileRequestDialog.setLayout(new BorderLayout()); // 设置布局
         receiveFileRequestDialog.setBackground(new Color(255, 255, 255));
+        receiveFileRequestDialog.addWindowListener(this);
 
         // 创建主Panel
         JPanel mainPanel = new JPanel();
@@ -198,4 +206,7 @@ public class ReceiveRequestUI {
             receiveFileRequestDialog.dispose();
     }
 
+    @Override public void windowClosing(WindowEvent e) {
+        request.decline();
+    }
 }
