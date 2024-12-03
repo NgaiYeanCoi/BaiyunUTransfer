@@ -81,6 +81,7 @@ public class MainUI extends WindowAdapter implements Callback {
     /*默认面板*/
     private JPanel defaultPanel;
     private JButton leftReceiveBtn;
+    private MarqueeLabel settingDefaultPathLabel;
 
     public MainUI() throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         createUI();
@@ -193,6 +194,7 @@ public class MainUI extends WindowAdapter implements Callback {
         JLabel sendPortLabel = new JLabel("端口:");
         sendPortLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 15));
         sendPortTextField = new JTextField(5);
+        sendPortTextField.setText("33890");
         sendPortTextField.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
         applyPortPattern(sendPortTextField);
         sendPortLabel.setBorder(BorderFactory.createEmptyBorder(0,10,0,0));//设置portLabel的边框
@@ -433,6 +435,7 @@ public class MainUI extends WindowAdapter implements Callback {
         JTextField receivePortTextField = new JTextField(5);
         receivePortTextField.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
         applyPortPattern(receivePortTextField); // 应用端口号输入正则表达式
+        receivePortTextField.setText("33890");
         // 创建监听按钮
         JButton receiveListenBtn = new JButton("监听端口");
         //创建停止监听按钮
@@ -551,7 +554,7 @@ public class MainUI extends WindowAdapter implements Callback {
         addSettingLabel("默认保存路径");
         JButton settingDefaultPathBtn = new JButton("设置");
         addSettingBtn(settingDefaultPathBtn);
-        JLabel settingDefaultPathLabel = new JLabel("当前的路径为：");
+        settingDefaultPathLabel = new MarqueeLabel("asdhasjkdhkajshdkjashdksahdjkashdhasjkdhasjkdhjkadhjkasjdhjasdkasjkdhka");
         settingDefaultPathLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 16));
         settingGbc.gridx = 0;
         settingGbc.weightx = 1.0; // 让标签占据更多空间
@@ -565,7 +568,8 @@ public class MainUI extends WindowAdapter implements Callback {
                 selectedDownloadDir = fileChooser.getSelectedFile().getAbsolutePath();
                 if (transferPoint != null)
                     transferPoint.setDownloadDir(new File(selectedDownloadDir));
-                settingDefaultPathLabel.setText("当前路径为："+selectedDownloadDir);
+                settingDefaultPathLabel.setMarqueeText(selectedDownloadDir);
+                ;
                 new InfoDialog(mainFrame,"设置默认路径成功！");
             }
         });
