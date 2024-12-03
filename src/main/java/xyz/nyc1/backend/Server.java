@@ -47,7 +47,8 @@ public class Server extends TransferPoint {
         } catch (InterruptedIOException|InterruptedException e) {
             System.out.println("Server: Shutting down due to interruption");
         } catch (IOException e) {
-            if (e.toString().contains("Socket closed")) {
+            String msg = e.toString();
+            if (msg.contains("Socket closed") || msg.contains("Socket is closed")) {
                 System.out.println("Server: Shutting down due to server closed");
             } else {
                 System.err.println("Server: Shutting down due to unexpected error");
@@ -81,8 +82,13 @@ public class Server extends TransferPoint {
             System.out.println("Server: Interrupted while communicating with client, rethrowing");
             throw e;
         } catch (IOException e) {
-            System.err.println("Server: Encounter errors while communicating with client");
-            e.printStackTrace();
+            String msg = e.toString();
+            if (msg.contains("Socket closed") || msg.contains("Socket is closed")) {
+                System.out.println("Server: Connection closed by client while communicating with it");
+            } else {
+                System.err.println("Server: Encounter errors while communicating with client");
+                e.printStackTrace();
+            }
         } finally {
             System.out.println("Server: Lost connection to address " + address);
             mIn = null;
