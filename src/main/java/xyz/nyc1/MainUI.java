@@ -524,7 +524,7 @@ public class MainUI extends WindowAdapter implements Callback {
         settingTopPanel.setBackground(Color.decode(viceColor));
 
         // 创建设置顶部信息Label
-        JLabel settingInfoLabel = new JLabel("设置");
+        JLabel settingInfoLabel = new JLabel("通用设置");
         settingInfoLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 25));
         settingInfoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         settingPanel.add(settingInfoLabel);//将settingInfoLabel添加进settingTopPanel里
