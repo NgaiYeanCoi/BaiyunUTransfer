@@ -334,12 +334,18 @@ public class MainUI extends WindowAdapter implements Callback {
                                 if(files.size()==1){
                                     File file = files.get(0);
                                     globalFilePath = file.getAbsolutePath();
-                                    receiveLogTextArea.append("已选择文件 " + globalFilePath + "\n");
-                                    sendLogTextArea.append("已选择文件 " + globalFilePath + "\n");
-                                    selectFileDialog.dispose();
-                                    selectFileBtn.setVisible(false);
-                                    cancelSelectedBtn.setVisible(true);
-                                    sendFileBtn.setVisible(true);
+                                    if(file.isFile()){
+                                        receiveLogTextArea.append("已选择文件 " + globalFilePath + "\n");
+                                        sendLogTextArea.append("已选择文件 " + globalFilePath + "\n");
+                                        selectFileDialog.dispose();
+                                        selectFileBtn.setVisible(false);
+                                        cancelSelectedBtn.setVisible(true);
+                                        sendFileBtn.setVisible(true);
+                                    }
+                                    else {
+                                        new ErrorDialog(selectFileDialog,"请选择一个文件，而不是文件夹！");
+                                        evt.rejectDrop();
+                                    }
 
                                 } else {
                                     new ErrorDialog(selectFileDialog, "一次只能发送一个文件,请重新操作！");
