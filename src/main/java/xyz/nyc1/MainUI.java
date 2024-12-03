@@ -122,17 +122,17 @@ public class MainUI extends WindowAdapter implements Callback {
         leftPanel.add(Box.createVerticalStrut(40));
 
         // 创建功能按钮
-        JButton leftSendBtn = new JButton("发送");
+        JButton leftSendBtn = new JButton("发起连接");
         leftSendBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         leftPanel.add(leftSendBtn);
         leftPanel.add(Box.createVerticalStrut(45));
 
-        leftReceiveBtn = new JButton("接收");
+        leftReceiveBtn = new JButton("接收连接");
         leftReceiveBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         leftPanel.add(leftReceiveBtn);
         leftPanel.add(Box.createVerticalStrut(45));
 
-        JButton leftSettingBtn = new JButton("设置");
+        JButton leftSettingBtn = new JButton("通用设置");
         leftSettingBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         leftPanel.add(leftSettingBtn);
         leftPanel.add(Box.createVerticalStrut(45));
@@ -560,7 +560,7 @@ public class MainUI extends WindowAdapter implements Callback {
         addSettingLabel("默认保存路径");
         JButton settingDefaultPathBtn = new JButton("设置");
         addSettingBtn(settingDefaultPathBtn);
-        settingDefaultPathLabel = new MarqueeLabel(TransferPoint.resolveDownloadPath().toString());
+        settingDefaultPathLabel = new MarqueeLabel(TransferPoint.resolveDownloadPath().toString() + " ");
         settingDefaultPathLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 16));
         settingGbc.gridx = 0;
         settingGbc.weightx = 1.0; // 让标签占据更多空间
