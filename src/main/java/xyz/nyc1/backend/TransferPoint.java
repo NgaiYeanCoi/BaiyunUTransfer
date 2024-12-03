@@ -190,14 +190,14 @@ public abstract class TransferPoint extends Thread implements Closeable {
                         // 计算校验
                         messageDigest.update(buf, 0, len);
                     }
-                    response = in.readUTF();
-                    if (!response.equals(REPLY_CONTINUE)) {
-                        System.err.println(mTag + ": Request interrupted by responding " + response);
-                        return;
-                    }
+//                    response = in.readUTF();
+//                    if (!response.equals(REPLY_CONTINUE)) {
+//                        System.err.println(mTag + ": Request interrupted by responding " + response);
+//                        return;
+//                    }
                 }
                 response = in.readUTF();
-                System.err.println(mTag + ": Request completed with " + response);
+                System.out.println(mTag + ": Request completed with " + response);
                 done = REPLY_OK.equals(response);
             } catch (InterruptedIOException e) {
                 System.err.println(mTag + ": Request aborted due to interruption");
@@ -299,8 +299,8 @@ public abstract class TransferPoint extends Thread implements Closeable {
                 }
                 mIn.readFully(buf, 0, length);
                 fos.write(buf, 0, length);
-                mOut.writeUTF(REPLY_CONTINUE);
-                mOut.flush();
+//                mOut.writeUTF(REPLY_CONTINUE);
+//                mOut.flush();
                 // 计算校验和
                 messageDigest.update(buf, 0, length);
             }
