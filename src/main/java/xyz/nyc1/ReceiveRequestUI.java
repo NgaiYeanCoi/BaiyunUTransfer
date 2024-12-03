@@ -148,30 +148,13 @@ public class ReceiveRequestUI {
         progressBar.setStringPainted(true);// 设置显示提示信息
         progressBar.setIndeterminate(true);// 设置采用不确定进度条
         progressBar.setString("正在传输中...");// 设置提示信息
-        progressBtn = new JButton("取消");
+        progressBtn = new JButton("确定");
+        progressBtn.setEnabled(false);
 
-        //TODO:当文件传输完之后需要接回调弹出窗口表示传输成功然后关闭该界面所有窗口
 
         // 将进度条和取消按钮添加到面板
         panel.add(progressBar, BorderLayout.CENTER);
         panel.add(progressBtn, BorderLayout.SOUTH);
-        // 设置取消按钮的点击事件
-        progressBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int result = JOptionPane.showConfirmDialog(progressDialog,"你确定要取消接收吗？","提示",JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
-                if (result == JOptionPane.YES_OPTION){
-                    System.out.println("yes");
-                    progressDialog.dispose();
-                    receiveFileRequestDialog.dispose();
-                    //TODO：需接后端API
-
-                }
-                else if(result == JOptionPane.NO_OPTION||result == JOptionPane.CLOSED_OPTION){
-                    System.out.println("cancel");
-                }
-            }
-        });
         // 将面板添加到对话框
         progressDialog.add(panel);
         progressDialog.setVisible(true);
@@ -180,6 +163,7 @@ public class ReceiveRequestUI {
     public void onTransferSuccess(File outputFile) {
         // TODO Implement
         progressBtn.setText("确定");
+        progressBtn.setEnabled(true);
         progressBar.setString("完成");
         // 移除现有的监听器
         ActionListener[] listeners = progressBtn.getActionListeners();

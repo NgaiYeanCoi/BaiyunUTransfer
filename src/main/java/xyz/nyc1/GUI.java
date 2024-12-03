@@ -70,7 +70,7 @@ public class GUI extends JFrame {
         clientBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //
+                /*//
                 mainFrame.dispose();
                 try {
                     new mainUI();
@@ -83,7 +83,7 @@ public class GUI extends JFrame {
                 } catch (IllegalAccessException ex) {
                     throw new RuntimeException(ex);
                 }
-                System.out.println("client");
+                System.out.println("client");*/
             }
         });
 
