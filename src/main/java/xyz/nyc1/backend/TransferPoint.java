@@ -77,15 +77,11 @@ public abstract class TransferPoint extends Thread implements Closeable {
         mTag = tag;
         mCallback = callback;
 
-        if (downloadDir == null) {
-            File defaultDownloadDir = new File(FileSystemView.getFileSystemView().getHomeDirectory(), "云移");
-            defaultDownloadDir.mkdirs();
-            setDownloadDir(defaultDownloadDir);
-        } else {
+        if (downloadDir != null) {
             setDownloadDir(new File(downloadDir));
         }
 
-        System.out.println(mTag + ": Create with " + mBaseDownloadPath);
+        System.out.println(mTag + ": Create with " + downloadDir);
     }
 
     /**
@@ -97,15 +93,35 @@ public abstract class TransferPoint extends Thread implements Closeable {
     }
 
     /**
-     * 设置下载到哪个文件夹 此文件夹必须存在
+     * 设置下载到哪个文件夹 此文件夹必须存在 若设置的文件夹无效将被重置回默认
      * @param dir 目标文件夹
      */
     public void setDownloadDir(File dir) {
+        if (dir == null) {
+            mBaseDownloadPath = null;
+            return;
+        }
         try {
             mBaseDownloadPath = dir.toPath().toRealPath(LinkOption.NOFOLLOW_LINKS);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Invalid dir: " + dir, e);
+            System.err.println(mTag + ": Error setting download dir to " + dir);
+            e.printStackTrace();
+            mBaseDownloadPath = null;
         }
+    }
+
+    /**
+     * 获取下载路径
+     */
+    public Path resolveDownloadPath() {
+        if (mBaseDownloadPath == null || !Files.isDirectory(mBaseDownloadPath)) {
+            File defaultDownloadDir = new File(FileSystemView.getFileSystemView().getHomeDirectory(), "云移");
+            defaultDownloadDir.mkdirs();
+            setDownloadDir(defaultDownloadDir);
+            if (mBaseDownloadPath == null)
+                throw new IllegalStateException("No valid download dir, and unable to create default one");
+        }
+        return mBaseDownloadPath;
     }
 
     /**
@@ -322,17 +338,27 @@ public abstract class TransferPoint extends Thread implements Closeable {
         }
     }
 
+    /**
+     * 检查文件名是否有效
+     * @param filename 文件名
+     * @return 有效 true，无效 false
+     */
     private boolean invalidFilename(String filename) {
-        if (mBaseDownloadPath == null)
-            throw new NullPointerException("for security reasons, set a base download dir");
+        Path base = resolveDownloadPath();
         // 阻止可能的路径穿越攻击
         if (filename.isEmpty() || filename.contains("/") || filename.contains("\\"))
             return true;
         // 额外的路径穿越检查
-        Path path = mBaseDownloadPath.resolve(filename).normalize();
-        return !path.startsWith(mBaseDownloadPath);
+        Path path = base.resolve(filename).normalize();
+        return !path.startsWith(base);
     }
 
+    /**
+     * 依据文件名生成输出文件
+     * @param filename 文件名
+     * @return 输出的文件
+     * @throws IOException 如果发生 I/O 错误
+     */
     private File generateOutputFile(String filename) throws IOException {
         int dot = filename.lastIndexOf(".");
         for (int i = 0;i != -1;i++) {
@@ -345,7 +371,7 @@ public abstract class TransferPoint extends Thread implements Closeable {
                 else
                     generated = filename.substring(0, dot) + "(" + i + ")" + filename.substring(dot);
             }
-            Path path = mBaseDownloadPath.resolve(generated).normalize();
+            Path path = resolveDownloadPath().resolve(generated).normalize();
             // 尝试创建文件以检查文件是否存在
             // 使用 NIO 的 createFile 是为了检测 path 指向一个存在的符号链接但是链接指向的文件不存在的情况以阻止意外写入其他文件
             try {
